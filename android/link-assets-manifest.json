@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/InstrumentSans-Medium.ttf",
+      "sha1": "312d5970140553bbb0cb5b6d44d8d1da9fe3e2d8"
+    },
+    {
+      "path": "src/assets/fonts/InstrumentSans-Regular.ttf",
+      "sha1": "b62434d9dfd9ee728ece7617579a3b18b7575dbb"
+    },
+    {
+      "path": "src/assets/fonts/Oi-Regular.ttf",
+      "sha1": "e1491f289af1dd858abe0283eef3f118cb932cac"
+    }
+  ]
+}

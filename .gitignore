@@ -69,7 +69,7 @@ android/.gradle/
 android/.idea/
 android/captures/
 android/local.properties
-android/.cxx/
+**/.cxx/
 android/app/release/
 android/.kotlin/
 *.hprof
