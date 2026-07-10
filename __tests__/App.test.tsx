@@ -12,6 +12,7 @@ test('bootstrap renders the tab navigator', async () => {
   const json = JSON.stringify(tree.toJSON());
   expect(json).toContain('Home');
   expect(json).toContain('Search');
+  expect(json).toContain('Facturas');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

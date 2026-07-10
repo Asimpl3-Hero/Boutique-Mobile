@@ -1,14 +1,7 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { styles } from './Search.styles';
+import { ScreenPlaceholder } from '@components/ux';
 
 /** Placeholder — product search lands in a later task. */
 export const SearchScreen = () => (
-  <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-    <View style={styles.content}>
-      <Text style={styles.title}>Search</Text>
-      <Text style={styles.subtitle}>Search coming soon</Text>
-    </View>
-  </SafeAreaView>
+  <ScreenPlaceholder title="Search" subtitle="Search coming soon" />
 );
