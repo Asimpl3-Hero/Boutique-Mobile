@@ -1,0 +1,121 @@
+# ---------------------------------------------------------------------------
+# Boutique-Mobile — React Native (bare + Expo compatible)
+# ---------------------------------------------------------------------------
+
+# ===== Node / JavaScript =====
+node_modules/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# ===== Environment / secrets =====
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.p12
+*.mobileprovision
+
+# ===== Metro / React Native =====
+.metro-health-check*
+.metro/
+metro.config.local.js
+# Metro / RN bundle artifacts
+*.jsbundle
+/android/app/src/main/assets/index.android.bundle
+/ios/main.jsbundle
+
+# ===== Testing / coverage =====
+coverage/
+/.nyc_output
+
+# ===== Caches =====
+.eslintcache
+.cache/
+.temp/
+.tmp/
+*.tsbuildinfo
+
+# ===== Expo (si se usa) =====
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# ===== iOS =====
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.hmap
+ios/.xcode.env.local
+ios/DerivedData/
+# CocoaPods lockfile: normalmente SÍ se versiona; descomentar solo si se decide lo contrario.
+# ios/Podfile.lock
+
+# ===== Android =====
+android/build/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/captures/
+android/local.properties
+android/.cxx/
+android/app/release/
+android/.kotlin/
+*.hprof
+*.keystore
+!debug.keystore
+*.jks
+# Gradle
+.gradle/
+build/
+
+# ===== Fastlane =====
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# ===== Bundle tooling / Ruby (iOS) =====
+vendor/bundle/
+.bundle/
+
+# ===== CocoaPods repo cache =====
+**/Pods/
+
+# ===== Ruby (cocoapods) =====
+*.gem
+
+# ===== OS files =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ===== Editors / IDEs =====
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+.history/
+
+# ===== Watchman / misc =====
+.watchmanconfig.local
+*.orig.*
