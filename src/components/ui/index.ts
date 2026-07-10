@@ -1,2 +1,2 @@
-// Public API of this layer. Add exports as modules are created.
-export {};
+// Public API of the ui layer: generic reusable primitives.
+export * from './icons';
