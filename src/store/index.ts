@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import uiReducer from './slices/uiSlice';
 import productsReducer from './slices/productsSlice';
 import cartReducer from './slices/cartSlice';
+import ordersReducer from './slices/ordersSlice';
 
 /**
  * Global store (Redux Toolkit, Flux architecture).
@@ -12,6 +13,7 @@ export const store = configureStore({
     ui: uiReducer,
     products: productsReducer,
     cart: cartReducer,
+    orders: ordersReducer,
   },
 });
 
@@ -22,3 +24,4 @@ export * from './hooks';
 export * from './slices/uiSlice';
 export * from './slices/productsSlice';
 export * from './slices/cartSlice';
+export * from './slices/ordersSlice';

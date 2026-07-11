@@ -8,12 +8,13 @@ import { colors, spacing } from '@theme';
 import type { RootStackScreenProps } from '@/navigation';
 import { styles } from './ProductDetail.styles';
 
-// Decorative finish swatches (design accent, not a backend attribute).
+// Decorative finish swatches in brand colors (not a backend attribute).
 const FINISH_SWATCHES = [
-  colors.text,
+  colors.primary,
+  colors.secondary,
   colors.accent,
-  colors.muted,
-  colors.surface,
+  colors.onAccent,
+  colors.success,
 ];
 
 type ProductDetailProps = RootStackScreenProps<'ProductDetail'>;
