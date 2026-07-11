@@ -1,65 +1,95 @@
 import React from 'react';
-import { ActivityIndicator, Modal, Text, View } from 'react-native';
-import { Button, CheckIcon } from '@components/ui';
-import Svg, { Path } from 'react-native-svg';
+import { Modal, Text, View } from 'react-native';
+import {
+  Button,
+  DeniedIcon,
+  DoneIcon,
+  LoadingIcon,
+} from '@components/ui';
 import { colors, moderateScale } from '@theme';
+import { CircularReveal } from '../CircularReveal';
+import { ProgressBar } from '../ProgressBar';
 import { styles } from './StatusScreen.styles';
 
-export type StatusScreenState = 'loading' | 'done' | 'denied';
+export type StatusState = 'loading' | 'success' | 'error';
 
 export interface StatusScreenProps {
   visible: boolean;
-  status: StatusScreenState;
-  title: string;
+  state: StatusState;
+  /** Defaults per state when omitted. */
+  title?: string;
   message?: string;
-  /** Shown on terminal states only. */
-  actionLabel?: string;
-  onAction?: () => void;
+  /** Error only: offers a retry action. */
+  onRetry?: () => void;
+  /** Terminal states: close/continue action. */
+  onDone?: () => void;
 }
 
-const CrossIcon = ({ size, color }: { size: number; color: string }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Path
-      d="m6.5 6.5 11 11m0-11-11 11"
-      stroke={color}
-      strokeWidth={2.4}
-      strokeLinecap="round"
-    />
-  </Svg>
-);
+const STATE_COLOR: Record<StatusState, string> = {
+  loading: colors.primary,
+  success: colors.success,
+  error: colors.error,
+};
 
-/** Full-screen process status: loading spinner, green done or red denied. */
+const DEFAULT_TITLE: Record<StatusState, string> = {
+  loading: 'Procesando…',
+  success: '¡Todo listo!',
+  error: 'Algo salió mal',
+};
+
+const ICON_SIZE = moderateScale(72);
+
+/** Full-screen status: circular reveal in the state color, SVG feedback
+ *  icon, minimalist progress bar and optional actions. Presentational —
+ *  the caller decides the state (e.g. checkout maps payment results). */
 export const StatusScreen = ({
   visible,
-  status,
+  state,
   title,
   message,
-  actionLabel,
-  onAction,
+  onRetry,
+  onDone,
 }: StatusScreenProps) => (
   <Modal visible={visible} animationType="fade" onRequestClose={() => {}}>
     <View style={styles.container}>
-      <View
-        style={[
-          styles.iconCircle,
-          status === 'loading' && styles.iconLoading,
-          status === 'done' && styles.iconDone,
-          status === 'denied' && styles.iconDenied,
-        ]}
-      >
-        {status === 'loading' ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : status === 'done' ? (
-          <CheckIcon size={moderateScale(48)} color={colors.onPrimary} />
+      <CircularReveal color={STATE_COLOR[state]} active durationMs={550} />
+      <View style={styles.content}>
+        {state === 'loading' ? (
+          <LoadingIcon size={ICON_SIZE} color={colors.onPrimary} />
+        ) : state === 'success' ? (
+          <DoneIcon size={ICON_SIZE} color={colors.onSuccess} />
         ) : (
-          <CrossIcon size={moderateScale(44)} color={colors.onPrimary} />
+          <DeniedIcon size={ICON_SIZE} color={colors.onError} />
         )}
+        <Text style={styles.title}>{title ?? DEFAULT_TITLE[state]}</Text>
+        {message ? <Text style={styles.message}>{message}</Text> : null}
+        <View style={styles.barWrapper}>
+          <ProgressBar
+            progress={state === 'loading' ? undefined : 1}
+            color={colors.surface}
+          />
+        </View>
+        {state !== 'loading' ? (
+          <View style={styles.actions}>
+            {state === 'error' && onRetry ? (
+              <Button
+                label="Reintentar"
+                variant="ghost"
+                onPress={onRetry}
+                style={styles.actionButton}
+              />
+            ) : null}
+            {onDone ? (
+              <Button
+                label={state === 'success' ? 'Continuar' : 'Volver al inicio'}
+                variant="ghost"
+                onPress={onDone}
+                style={styles.actionButton}
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
-      <Text style={styles.title}>{title}</Text>
-      {message ? <Text style={styles.message}>{message}</Text> : null}
-      {status !== 'loading' && actionLabel && onAction ? (
-        <Button label={actionLabel} onPress={onAction} style={styles.action} />
-      ) : null}
     </View>
   </Modal>
 );

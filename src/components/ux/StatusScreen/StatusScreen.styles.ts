@@ -1,43 +1,39 @@
 import { StyleSheet } from 'react-native';
-import { colors, moderateScale, radius, spacing, typography } from '@theme';
+import { colors, spacing, typography } from '@theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.container,
     gap: spacing.lg,
   },
-  iconCircle: {
-    width: moderateScale(96),
-    height: moderateScale(96),
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconLoading: {
-    backgroundColor: colors.muted,
-  },
-  iconDone: {
-    backgroundColor: colors.success,
-  },
-  iconDenied: {
-    backgroundColor: colors.error,
-  },
   title: {
     ...typography.heading,
-    color: colors.text,
+    color: colors.onPrimary,
     textAlign: 'center',
   },
   message: {
     ...typography.bodySm,
-    color: colors.textMuted,
+    color: colors.onPrimary,
+    opacity: 0.9,
     textAlign: 'center',
   },
-  action: {
+  barWrapper: {
     alignSelf: 'stretch',
     marginTop: spacing.md,
+  },
+  actions: {
+    alignSelf: 'stretch',
+    gap: spacing.md,
+    marginTop: spacing.md,
+  },
+  actionButton: {
+    backgroundColor: colors.surface,
   },
 });

@@ -251,11 +251,11 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
       </View>
       <StatusScreen
         visible={flowStatus !== 'idle'}
-        status={
+        state={
           flowStatus === 'approved'
-            ? 'done'
+            ? 'success'
             : flowStatus === 'declined' || flowStatus === 'error'
-              ? 'denied'
+              ? 'error'
               : 'loading'
         }
         title={
@@ -276,8 +276,8 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
                 ? flowError ?? undefined
                 : 'No cierres la app.'
         }
-        actionLabel="Volver al inicio"
-        onAction={closeStatus}
+        onRetry={flowStatus === 'error' ? handlePay : undefined}
+        onDone={closeStatus}
       />
     </SafeAreaView>
   );

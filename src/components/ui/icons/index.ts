@@ -15,3 +15,6 @@ export * from './FlameIcon';
 export * from './CheckIcon';
 export * from './ShieldIcon';
 export * from './TruckIcon';
+export * from './DoneIcon';
+export * from './DeniedIcon';
+export * from './LoadingIcon';
