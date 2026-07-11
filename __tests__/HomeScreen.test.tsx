@@ -77,11 +77,18 @@ describe('HomeScreen', () => {
     const tree = await renderHome(makeStore());
     await flush();
 
-    // Category mosaic (underlined Oi titles), no product names or prices.
+    // Category mosaic plus the product carousel under the hero.
     expect(hasText(tree, 'Novedades')).toBe(true);
     expect(hasText(tree, 'Más Vendidos')).toBe(true);
     expect(hasText(tree, 'Camisetas')).toBe(true);
     expect(hasText(tree, 'Total Looks')).toBe(true);
+    // Carousel tiles are image-only: the add-to-cart overlay is present,
+    // but no name/price text is rendered.
+    expect(
+      tree.root.findAllByProps({
+        accessibilityLabel: 'Agregar Summer Dress al carrito',
+      }).length,
+    ).toBeGreaterThan(0);
     expect(hasText(tree, '$ 16.800')).toBe(false);
     expect(hasText(tree, 'Categorías')).toBe(true);
     await ReactTestRenderer.act(() => tree.unmount());

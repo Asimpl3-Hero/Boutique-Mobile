@@ -76,7 +76,8 @@ export const SplashScreen = ({ navigation }: SplashScreenProps) => {
     return () => clearTimeout(timer);
   }, [navigation]);
 
-  const logoSize = Math.min(width, height) * 0.6;
+  // Modest size, optically centered in the free area above the version tag.
+  const logoSize = Math.min(width, height) * 0.45;
 
   return (
     <SafeAreaView style={styles.container}>

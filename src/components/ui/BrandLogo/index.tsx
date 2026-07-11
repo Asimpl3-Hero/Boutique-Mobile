@@ -3,7 +3,7 @@ import { Image } from 'react-native';
 import { moderateScale } from '@theme';
 import { styles } from './BrandLogo.styles';
 
-const logoSource = require('@/assets/images/borcelle-logo.png');
+const logoSource = require('@/assets/images/logos/Borcelle.png');
 
 export interface BrandLogoProps {
   /** Rendered width in scaled points (the PNG is square). */
@@ -16,7 +16,8 @@ export const BrandLogo = ({ size = moderateScale(120) }: BrandLogoProps) => (
     source={logoSource}
     accessibilityRole="image"
     accessibilityLabel="Borcelle"
-    style={[styles.logo, { width: size }]}
+    // Explicit box: never fall back to the PNG's intrinsic 2000px size.
+    style={[styles.logo, { width: size, height: size }]}
     resizeMode="contain"
   />
 );

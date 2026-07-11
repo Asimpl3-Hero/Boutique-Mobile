@@ -2,10 +2,10 @@ import { StyleSheet } from 'react-native';
 import { colors, moderateScale, radius, spacing, typography } from '@theme';
 
 export const styles = StyleSheet.create({
+  // Flat tile: square corners so cards can sit flush in strips/grids.
   container: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: radius.card,
     // Elevation level 1: subtle lift over the background.
     shadowColor: colors.text,
     shadowOffset: { width: 0, height: 2 },
@@ -14,8 +14,6 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
   imageWrapper: {
-    borderTopLeftRadius: radius.card,
-    borderTopRightRadius: radius.card,
     overflow: 'hidden',
     backgroundColor: colors.muted,
   },
@@ -26,17 +24,6 @@ export const styles = StyleSheet.create({
   imageWide: {
     width: '100%',
     aspectRatio: 1.5,
-  },
-  wishlist: {
-    position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    width: moderateScale(32),
-    height: moderateScale(32),
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   info: {
     paddingHorizontal: spacing.md,
@@ -64,5 +51,11 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Tile variant: the add button floats on the image's lower corner.
+  addButtonOverlay: {
+    position: 'absolute',
+    bottom: spacing.sm,
+    right: spacing.sm,
   },
 });

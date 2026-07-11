@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 import { colors, moderateScale, radius, spacing, typography } from '@theme';
 
 export const styles = StyleSheet.create({
+  // Full-bleed cover: edge to edge, square corners, tucked under the wave.
   container: {
-    borderRadius: radius.card,
     overflow: 'hidden',
     backgroundColor: colors.secondary,
     height: moderateScale(320),

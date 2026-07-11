@@ -25,18 +25,20 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.container,
   },
+  // Underline hugs the heading text, brand accent in secondary.
+  sectionTitleWrapper: {
+    alignSelf: 'flex-start',
+    borderBottomWidth: moderateScale(3),
+    borderBottomColor: colors.secondary,
+    paddingBottom: spacing.xs,
+  },
   sectionTitle: {
     ...typography.heading,
     color: colors.text,
   },
-  seeAll: {
-    ...typography.bodySm,
-    fontFamily: typography.button.fontFamily,
-    color: colors.primary,
-  },
+  // Full-bleed mosaic: tiles span the whole screen width.
   mosaicRow: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.container,
   },
   mosaicCell: {
     flex: 1,
@@ -46,7 +48,6 @@ export const styles = StyleSheet.create({
   },
   skeletonRow: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.container,
   },
   skeletonCard: {
     flex: 1,

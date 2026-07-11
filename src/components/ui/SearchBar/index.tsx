@@ -9,6 +9,7 @@ export interface SearchBarProps {
   onChangeText?: (text: string) => void;
   placeholder?: string;
   editable?: boolean;
+  autoFocus?: boolean;
 }
 
 export const SearchBar = ({
@@ -16,6 +17,7 @@ export const SearchBar = ({
   onChangeText,
   placeholder = 'Buscar productos',
   editable = true,
+  autoFocus = false,
 }: SearchBarProps) => (
   <View style={styles.container}>
     <SearchIcon size={moderateScale(20)} color={colors.textMuted} />
@@ -27,6 +29,7 @@ export const SearchBar = ({
       placeholder={placeholder}
       placeholderTextColor={colors.textMuted}
       editable={editable}
+      autoFocus={autoFocus}
       returnKeyType="search"
     />
   </View>

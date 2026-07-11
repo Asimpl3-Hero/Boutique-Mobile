@@ -78,23 +78,4 @@ describe('ProductCard', () => {
     expect(selectCartItems(store.getState())[0].product.id).toBe('p-1');
   });
 
-  test('wishlist heart toggles its selected state', async () => {
-    const tree = await render(
-      <Provider store={makeStore()}>
-        <ProductCard product={product} />
-      </Provider>,
-    );
-
-    const heart = tree.root.findByProps({
-      accessibilityLabel: 'Agregar Summer Dress a favoritos',
-    });
-    expect(heart.props.accessibilityState).toEqual({});
-
-    await ReactTestRenderer.act(() => heart.props.onPress());
-    expect(
-      tree.root.findByProps({
-        accessibilityLabel: 'Agregar Summer Dress a favoritos',
-      }).props.accessibilityState,
-    ).toEqual({ selected: true });
-  });
 });

@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header, BAR_HEIGHT, WAVE_HEIGHT } from '@components/layout';
 import { Button, HangerIcon, ShirtIcon } from '@components/ui';
-import { CategoryCard, HeroBanner } from '@components/features';
+import {
+  CategoryCard,
+  HeroBanner,
+  ProductCarousel,
+} from '@components/features';
 import { Skeleton } from '@components/ux';
 import {
   useAppDispatch,
@@ -14,6 +18,7 @@ import {
   selectProductsStatus,
 } from '@store';
 import { colors, moderateScale, spacing } from '@theme';
+import { navigationRef } from '@/navigation';
 import { styles } from './Home.styles';
 
 interface MosaicItem {
@@ -176,24 +181,34 @@ export const HomeScreen = () => {
         renderItem={renderItem}
         contentContainerStyle={[
           styles.listContent,
-          {
-            paddingTop: WAVE_HEIGHT,
-            // Content must clear the floating tab bar and the home indicator.
-            paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2,
-          },
+          // Content must clear the floating tab bar and the home indicator.
+          // No top padding: the hero starts right under the header's wave.
+          { paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2 },
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={listEmpty}
         ListHeaderComponent={
           <View style={styles.listHeader}>
-            <View style={styles.padded}>
-              <HeroBanner />
-            </View>
+            <HeroBanner />
             <View style={styles.sectionRow}>
-              <Text style={styles.sectionTitle}>Categorías</Text>
-              <Pressable accessibilityRole="button" hitSlop={spacing.sm}>
-                <Text style={styles.seeAll}>Ver todo</Text>
-              </Pressable>
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Moda Borcelle</Text>
+              </View>
+            </View>
+            {products.length > 0 ? (
+              <ProductCarousel
+                products={products}
+                onPressProduct={productId => {
+                  if (navigationRef.isReady()) {
+                    navigationRef.navigate('ProductDetail', { productId });
+                  }
+                }}
+              />
+            ) : null}
+            <View style={styles.sectionRow}>
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Categorías</Text>
+              </View>
             </View>
           </View>
         }

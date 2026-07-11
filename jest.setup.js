@@ -6,6 +6,12 @@ jest.mock('react-native-safe-area-context', () => {
   return mock.default ?? mock;
 });
 
+// Native blur view isn't available under Jest — render a plain View.
+jest.mock('@react-native-community/blur', () => {
+  const { View } = require('react-native');
+  return { BlurView: View };
+});
+
 // Native env module isn't available under Jest — provide the test values.
 jest.mock('react-native-config', () => ({
   API_URL: 'http://localhost:3000',

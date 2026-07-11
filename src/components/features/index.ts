@@ -2,4 +2,6 @@
 export * from './CategoryChips';
 export * from './HeroBanner';
 export * from './ProductCard';
+export * from './ProductCarousel';
 export * from './CategoryCard';
+export * from './SearchOverlay';
