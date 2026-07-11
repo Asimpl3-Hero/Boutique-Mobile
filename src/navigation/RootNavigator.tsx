@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CheckoutScreen, ProductDetailScreen, SplashScreen } from '@screens';
+import { CheckoutScreen, SplashScreen } from '@screens';
 import { MainTabs } from './MainTabs';
 import type { RootStackParamList } from './types';
 
@@ -13,7 +13,6 @@ export const RootNavigator = () => (
   >
     <Stack.Screen name="Splash" component={SplashScreen} />
     <Stack.Screen name="Main" component={MainTabs} />
-    <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
     <Stack.Screen name="Cart" component={CheckoutScreen} />
   </Stack.Navigator>
 );

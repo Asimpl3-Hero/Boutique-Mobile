@@ -13,3 +13,5 @@ export * from './ShirtIcon';
 export * from './SparkleIcon';
 export * from './FlameIcon';
 export * from './CheckIcon';
+export * from './ShieldIcon';
+export * from './TruckIcon';

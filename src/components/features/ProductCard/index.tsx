@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { colors, moderateScale } from '@theme';
-import { PlusIcon } from '@components/ui';
+import { CheckIcon, PlusIcon } from '@components/ui';
 import { useAppDispatch, addItem } from '@store';
 import type { Product } from '@lib/services/products';
 import { styles } from './ProductCard.styles';
@@ -19,14 +19,65 @@ export interface ProductCardProps {
 
 // 32/36pt controls + hitSlop keep touch targets at ≥44pt.
 const HIT_SLOP = moderateScale(6);
+/** How long the button stays locked showing the success feedback. */
+const ADDED_FEEDBACK_MS = 3000;
 
-/** Catalog card: image, wishlist heart, name, price and add-to-cart. */
+/** Catalog card: image, name, price and add-to-cart with success feedback. */
 export const ProductCard = ({
   product,
   variant = 'half',
   onPress,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const [justAdded, setJustAdded] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    },
+    [],
+  );
+
+  const handleAdd = () => {
+    if (justAdded) {
+      return;
+    }
+    dispatch(addItem(product));
+    setJustAdded(true);
+    timerRef.current = setTimeout(
+      () => setJustAdded(false),
+      ADDED_FEEDBACK_MS,
+    );
+  };
+
+  const addButton = (overlay: boolean) => (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={
+        justAdded
+          ? `${product.name} agregado al carrito`
+          : `Agregar ${product.name} al carrito`
+      }
+      accessibilityState={justAdded ? { disabled: true } : {}}
+      disabled={justAdded}
+      hitSlop={HIT_SLOP}
+      onPress={handleAdd}
+      style={[
+        styles.addButton,
+        overlay && styles.addButtonOverlay,
+        justAdded && styles.addButtonSuccess,
+      ]}
+    >
+      {justAdded ? (
+        <CheckIcon size={moderateScale(18)} color={colors.onPrimary} />
+      ) : (
+        <PlusIcon size={moderateScale(18)} color={colors.onPrimary} />
+      )}
+    </Pressable>
+  );
 
   return (
     <Pressable
@@ -42,17 +93,7 @@ export const ProductCard = ({
           resizeMode="cover"
           accessibilityLabel={product.name}
         />
-        {variant === 'tile' ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Agregar ${product.name} al carrito`}
-            hitSlop={HIT_SLOP}
-            onPress={() => dispatch(addItem(product))}
-            style={[styles.addButton, styles.addButtonOverlay]}
-          >
-            <PlusIcon size={moderateScale(18)} color={colors.onPrimary} />
-          </Pressable>
-        ) : null}
+        {variant === 'tile' ? addButton(true) : null}
       </View>
       {variant !== 'tile' ? (
         <View style={styles.info}>
@@ -61,15 +102,7 @@ export const ProductCard = ({
           </Text>
           <View style={styles.row}>
             <Text style={styles.price}>{product.formattedPrice}</Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Agregar ${product.name} al carrito`}
-              hitSlop={HIT_SLOP}
-              onPress={() => dispatch(addItem(product))}
-              style={styles.addButton}
-            >
-              <PlusIcon size={moderateScale(18)} color={colors.onPrimary} />
-            </Pressable>
+            {addButton(false)}
           </View>
         </View>
       ) : null}

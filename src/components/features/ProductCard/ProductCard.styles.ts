@@ -58,4 +58,8 @@ export const styles = StyleSheet.create({
     bottom: spacing.sm,
     right: spacing.sm,
   },
+  // Just-added feedback: locked for a moment showing the check.
+  addButtonSuccess: {
+    backgroundColor: colors.success,
+  },
 });

@@ -2,3 +2,4 @@
 export * from './ScreenPlaceholder';
 export * from './Skeleton';
 export * from './Stepper';
+export * from './PerkBadge';

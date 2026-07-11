@@ -41,13 +41,19 @@ const cartSlice = createSlice({
         );
       }
     },
+    /** Drops the whole entry regardless of quantity. */
+    removeLine(state, action: PayloadAction<string>) {
+      state.items = state.items.filter(
+        item => item.product.id !== action.payload,
+      );
+    },
     clear(state) {
       state.items = [];
     },
   },
 });
 
-export const { addItem, removeItem, clear } = cartSlice.actions;
+export const { addItem, removeItem, removeLine, clear } = cartSlice.actions;
 
 interface WithCart {
   cart: CartState;

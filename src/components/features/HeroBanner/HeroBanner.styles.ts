@@ -27,9 +27,7 @@ export const styles = StyleSheet.create({
   title: {
     ...typography.headingLg,
     color: colors.onPrimary,
-  },
-  button: {
-    alignSelf: 'flex-start',
-    marginTop: spacing.sm,
+    // Narrow enough to break "Colección de Verano" onto two lines.
+    maxWidth: '65%',
   },
 });

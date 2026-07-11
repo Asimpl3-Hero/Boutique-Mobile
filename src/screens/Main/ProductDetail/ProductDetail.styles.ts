@@ -42,6 +42,11 @@ export const styles = StyleSheet.create({
     ...typography.headingLg,
     color: colors.text,
   },
+  stock: {
+    ...typography.caption,
+    fontFamily: typography.button.fontFamily,
+    color: colors.success,
+  },
   description: {
     ...typography.bodySm,
     color: colors.textMuted,
@@ -71,8 +76,67 @@ export const styles = StyleSheet.create({
     borderWidth: moderateScale(2),
     borderColor: colors.primary,
   },
+  sizeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  sizeButton: {
+    minWidth: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: radius.md,
+    borderWidth: moderateScale(1.5),
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  sizeButtonSelected: {
+    borderColor: colors.primary,
+    borderWidth: moderateScale(2),
+  },
+  sizeText: {
+    ...typography.bodySm,
+    fontFamily: typography.button.fontFamily,
+    color: colors.textMuted,
+  },
+  sizeTextSelected: {
+    color: colors.primary,
+  },
+  qtyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  qtyButton: {
+    width: moderateScale(36),
+    height: moderateScale(36),
+    borderRadius: radius.pill,
+    backgroundColor: colors.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qtyButtonText: {
+    ...typography.button,
+    fontSize: moderateScale(16),
+    color: colors.text,
+  },
+  qtyValue: {
+    ...typography.body,
+    fontFamily: typography.button.fontFamily,
+    color: colors.text,
+    minWidth: moderateScale(24),
+    textAlign: 'center',
+  },
   addButton: {
     marginTop: spacing.xl,
+  },
+  perksRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.lg,
   },
   stateContainer: {
     flex: 1,

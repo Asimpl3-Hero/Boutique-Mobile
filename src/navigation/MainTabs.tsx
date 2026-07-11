@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FloatingTabBar } from '@components/layout';
-import { SearchOverlay } from '@components/features';
+import { CartFab, CartModal, SearchOverlay } from '@components/features';
 import { HomeIcon, ReceiptIcon, SearchIcon } from '@components/ui';
-import { HomeScreen, InvoicesScreen } from '@screens';
+import { InvoicesScreen } from '@screens';
 import { moderateScale } from '@theme';
+import { HomeStack } from './HomeStack';
 import { navigationRef } from './navigationRef';
 import type { RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const ICON_SIZE = moderateScale(24);
+const ACTION_ICON_SIZE = moderateScale(28);
 
 /** The Search tab never navigates (tabPress opens the overlay), but the
  *  navigator still requires a component for the route. */
 const SearchFallback = () => null;
-const ACTION_ICON_SIZE = moderateScale(28);
+
+const openProductDetail = (productId: string) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate('Main', {
+      screen: 'Home',
+      params: { screen: 'ProductDetail', params: { productId } },
+    });
+  }
+};
 
 export const MainTabs = () => {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <>
@@ -29,7 +40,7 @@ export const MainTabs = () => {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={HomeStack}
           options={{
             title: 'Inicio',
             tabBarIcon: ({ color }) => (
@@ -69,12 +80,19 @@ export const MainTabs = () => {
           }}
         />
       </Tab.Navigator>
+      {/* Overlays shared by every non-checkout surface. */}
+      <CartFab onPress={() => setCartOpen(true)} />
       <SearchOverlay
         visible={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelectProduct={productId => {
+        onSelectProduct={openProductDetail}
+      />
+      <CartModal
+        visible={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onCheckout={() => {
           if (navigationRef.isReady()) {
-            navigationRef.navigate('ProductDetail', { productId });
+            navigationRef.navigate('Cart');
           }
         }}
       />

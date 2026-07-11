@@ -2,3 +2,4 @@
 export * from './api';
 export * from './products';
 export * from './orders';
+export * from './payments';

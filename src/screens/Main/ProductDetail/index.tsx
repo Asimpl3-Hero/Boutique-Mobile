@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Header } from '@components/layout';
-import { Button } from '@components/ui';
+import { Header, BAR_HEIGHT } from '@components/layout';
+import { Button, ShieldIcon, TruckIcon } from '@components/ui';
+import { PerkBadge } from '@components/ux';
 import { useAppDispatch, useAppSelector, addItem, selectProductById } from '@store';
-import { colors, spacing } from '@theme';
-import type { RootStackScreenProps } from '@/navigation';
+import { colors, moderateScale, spacing } from '@theme';
+import type { HomeStackScreenProps } from '@/navigation';
 import { styles } from './ProductDetail.styles';
+
+/** Decorative sizes (not a backend attribute). */
+const SIZES = ['S', 'M', 'L', 'XL'];
 
 // Decorative finish swatches in brand colors (not a backend attribute).
 const FINISH_SWATCHES = [
@@ -17,7 +21,7 @@ const FINISH_SWATCHES = [
   colors.success,
 ];
 
-type ProductDetailProps = RootStackScreenProps<'ProductDetail'>;
+type ProductDetailProps = HomeStackScreenProps<'ProductDetail'>;
 
 /** Product detail: large image, story copy and add-to-cart (flow screen 3). */
 export const ProductDetailScreen = ({
@@ -30,6 +34,8 @@ export const ProductDetailScreen = ({
     selectProductById(state, route.params.productId),
   );
   const [selectedFinish, setSelectedFinish] = useState(0);
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [quantity, setQuantity] = useState(1);
 
   if (!product) {
     // Resilient fallback: never crash on a stale/unknown id.
@@ -56,7 +62,8 @@ export const ProductDetailScreen = ({
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: insets.bottom + spacing.xl,
+          // Clears the floating tab bar and the home indicator.
+          paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2,
         }}
       >
         <Image
@@ -71,6 +78,11 @@ export const ProductDetailScreen = ({
             <Text style={styles.price}>{product.formattedPrice}</Text>
           </View>
           <Text style={styles.name}>{product.name}</Text>
+          <Text style={styles.stock}>
+            {product.stock > 0
+              ? `${product.stock} disponibles en stock`
+              : 'Agotado'}
+          </Text>
           <Text style={styles.description}>{product.description}</Text>
           <Text style={styles.sectionLabel}>Acabado</Text>
           <View style={styles.swatchRow}>
@@ -92,11 +104,83 @@ export const ProductDetailScreen = ({
               />
             ))}
           </View>
+          <Text style={styles.sectionLabel}>Talla</Text>
+          <View style={styles.sizeRow}>
+            {SIZES.map(size => (
+              <Pressable
+                key={size}
+                accessibilityRole="button"
+                accessibilityLabel={`Talla ${size}`}
+                accessibilityState={
+                  size === selectedSize ? { selected: true } : {}
+                }
+                onPress={() => setSelectedSize(size)}
+                style={[
+                  styles.sizeButton,
+                  size === selectedSize && styles.sizeButtonSelected,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.sizeText,
+                    size === selectedSize && styles.sizeTextSelected,
+                  ]}
+                >
+                  {size}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text style={styles.sectionLabel}>Cantidad</Text>
+          <View style={styles.qtyRow}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Disminuir cantidad"
+              style={styles.qtyButton}
+              onPress={() => setQuantity(current => Math.max(1, current - 1))}
+            >
+              <Text style={styles.qtyButtonText}>−</Text>
+            </Pressable>
+            <Text style={styles.qtyValue}>{quantity}</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Aumentar cantidad"
+              style={styles.qtyButton}
+              onPress={() =>
+                setQuantity(current => Math.min(product.stock, current + 1))
+              }
+            >
+              <Text style={styles.qtyButtonText}>+</Text>
+            </Pressable>
+          </View>
           <Button
-            label="Añadir al Carrito"
-            onPress={() => dispatch(addItem(product))}
+            label={
+              quantity > 1
+                ? `Añadir ${quantity} al Carrito`
+                : 'Añadir al Carrito'
+            }
+            disabled={product.stock === 0}
+            onPress={() => {
+              for (let unit = 0; unit < quantity; unit += 1) {
+                dispatch(addItem(product));
+              }
+            }}
             style={styles.addButton}
           />
+          <View style={styles.perksRow}>
+            <PerkBadge
+              icon={
+                <ShieldIcon size={moderateScale(20)} color={colors.text} />
+              }
+              title="Garantía"
+              text="Si no te vuela la cabeza, te devolvemos tu dinero."
+            />
+            <PerkBadge
+              icon={<TruckIcon size={moderateScale(20)} color={colors.text} />}
+              title="Envíos"
+              text="Entregas rápidas a todo el país. Tu estilo no puede esperar."
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

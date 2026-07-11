@@ -2,23 +2,32 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
-/** Root stack: Splash boots the app, Main hosts the bottom tabs. */
+/** Root stack: Splash boots the app, Main hosts the tabs, Cart is the
+ *  checkout takeover (the only surface without tab bar / FAB). */
 export type RootStackParamList = {
   Splash: undefined;
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
-  ProductDetail: { productId: string };
   Cart: undefined;
 };
 
-/** Bottom-tab routes. Cart is a FAB (mobile-05), not a tab; no auth/profile. */
+/** Stack nested in the Home tab so detail keeps the tab bar and FAB. */
+export type HomeStackParamList = {
+  HomeMain: undefined;
+  ProductDetail: { productId: string };
+};
+
+/** Bottom-tab routes. Cart is a FAB, not a tab; no auth/profile. */
 export type RootTabParamList = {
-  Home: undefined;
+  Home: NavigatorScreenParams<HomeStackParamList> | undefined;
   Search: undefined;
   Invoices: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>;
+
+export type HomeStackScreenProps<T extends keyof HomeStackParamList> =
+  NativeStackScreenProps<HomeStackParamList, T>;
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> =
   BottomTabScreenProps<RootTabParamList, T>;

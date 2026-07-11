@@ -27,18 +27,13 @@ const render = async (element: React.ReactElement) => {
 };
 
 describe('HeroBanner', () => {
-  test('renders the campaign texts and fires the action', async () => {
-    const onActionPress = jest.fn();
-    const tree = await render(<HeroBanner onActionPress={onActionPress} />);
+  test('renders the campaign copy without a CTA', async () => {
+    const tree = await render(<HeroBanner />);
 
     const json = JSON.stringify(tree.toJSON());
     expect(json).toContain('Edición Limitada');
     expect(json).toContain('Colección de Verano');
-    expect(json).toContain('Comprar el Look');
-
-    const button = tree.root.findByProps({ accessibilityRole: 'button' });
-    await ReactTestRenderer.act(() => button.props.onPress());
-    expect(onActionPress).toHaveBeenCalledTimes(1);
+    expect(json).not.toContain('Comprar el Look');
   });
 });
 
@@ -60,7 +55,8 @@ describe('ProductCard', () => {
     expect(image.props.source).toEqual({ uri: product.imageUrl });
   });
 
-  test('add-to-cart dispatches addItem to the cart slice', async () => {
+  test('add-to-cart dispatches once, locks with success feedback for 3s', async () => {
+    jest.useFakeTimers();
     const store = makeStore();
     const tree = await render(
       <Provider store={store}>
@@ -72,10 +68,29 @@ describe('ProductCard', () => {
       accessibilityLabel: 'Agregar Summer Dress al carrito',
     });
     await ReactTestRenderer.act(() => addButton.props.onPress());
-    await ReactTestRenderer.act(() => addButton.props.onPress());
 
-    expect(selectCartCount(store.getState())).toBe(2);
+    expect(selectCartCount(store.getState())).toBe(1);
     expect(selectCartItems(store.getState())[0].product.id).toBe('p-1');
+
+    // While locked: success state shown, presses are ignored.
+    const locked = tree.root.findByProps({
+      accessibilityLabel: 'Summer Dress agregado al carrito',
+    });
+    expect(locked.props.accessibilityState).toEqual({ disabled: true });
+    await ReactTestRenderer.act(() => locked.props.onPress());
+    expect(selectCartCount(store.getState())).toBe(1);
+
+    // After the feedback window it accepts presses again.
+    await ReactTestRenderer.act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    const unlocked = tree.root.findByProps({
+      accessibilityLabel: 'Agregar Summer Dress al carrito',
+    });
+    await ReactTestRenderer.act(() => unlocked.props.onPress());
+    expect(selectCartCount(store.getState())).toBe(2);
+
+    jest.useRealTimers();
   });
 
 });

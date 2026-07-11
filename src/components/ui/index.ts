@@ -4,3 +4,4 @@ export * from './BrandLogo';
 export * from './Button';
 export * from './Chip';
 export * from './SearchBar';
+export * from './TextInputField';
