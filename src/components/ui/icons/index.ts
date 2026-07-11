@@ -5,3 +5,8 @@ export * from './MenuIcon';
 export * from './BellIcon';
 export * from './HeartIcon';
 export * from './PlusIcon';
+export * from './ChevronLeftIcon';
+export * from './HangerIcon';
+export * from './ShirtIcon';
+export * from './SparkleIcon';
+export * from './FlameIcon';

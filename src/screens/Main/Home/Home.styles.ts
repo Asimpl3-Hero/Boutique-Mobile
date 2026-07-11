@@ -1,10 +1,16 @@
 import { StyleSheet } from 'react-native';
+import { WAVE_HEIGHT } from '@components/layout';
 import { colors, moderateScale, spacing, typography } from '@theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  // List tucks behind the header's wave; the content padding restores the
+  // resting position so items only slide under the curve while scrolling.
+  list: {
+    marginTop: -WAVE_HEIGHT,
   },
   listHeader: {
     gap: spacing.lg,
@@ -28,22 +34,27 @@ export const styles = StyleSheet.create({
     fontFamily: typography.button.fontFamily,
     color: colors.primary,
   },
-  columnWrapper: {
-    gap: spacing.gutter,
+  mosaicRow: {
+    flexDirection: 'row',
     paddingHorizontal: spacing.container,
   },
+  mosaicCell: {
+    flex: 1,
+  },
   listContent: {
-    gap: spacing.gutter,
+    gap: 0,
   },
   skeletonRow: {
     flexDirection: 'row',
-    gap: spacing.gutter,
     paddingHorizontal: spacing.container,
-    marginBottom: spacing.gutter,
   },
   skeletonCard: {
     flex: 1,
     height: moderateScale(240),
+  },
+  skeletonWide: {
+    flex: 1,
+    height: moderateScale(200),
   },
   stateContainer: {
     alignItems: 'center',

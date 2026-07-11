@@ -21,6 +21,7 @@ export const MainTabs = () => (
       name="Home"
       component={HomeScreen}
       options={{
+        title: 'Inicio',
         tabBarIcon: ({ color }) => <HomeIcon size={ICON_SIZE} color={color} />,
       }}
     />
@@ -28,6 +29,7 @@ export const MainTabs = () => (
       name="Search"
       component={SearchScreen}
       options={{
+        title: 'Buscar',
         tabBarIcon: ({ color }) => (
           <SearchIcon size={ACTION_ICON_SIZE} color={color} strokeWidth={2.2} />
         ),

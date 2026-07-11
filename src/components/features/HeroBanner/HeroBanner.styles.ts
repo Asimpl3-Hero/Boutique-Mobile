@@ -4,11 +4,18 @@ import { colors, moderateScale, radius, spacing, typography } from '@theme';
 export const styles = StyleSheet.create({
   container: {
     borderRadius: radius.card,
-    backgroundColor: colors.secondary,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xl,
-    gap: spacing.sm,
     overflow: 'hidden',
+    backgroundColor: colors.secondary,
+    height: moderateScale(320),
+  },
+  // Scrim keeps the copy legible over the photo.
+  content: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+    justifyContent: 'flex-end',
+    gap: spacing.sm,
   },
   eyebrow: {
     ...typography.caption,
@@ -19,16 +26,10 @@ export const styles = StyleSheet.create({
   },
   title: {
     ...typography.headingLg,
-    color: colors.onSecondary,
+    color: colors.onPrimary,
   },
   button: {
     alignSelf: 'flex-start',
     marginTop: spacing.sm,
-  },
-  daisy: {
-    position: 'absolute',
-    right: -moderateScale(20),
-    bottom: -moderateScale(20),
-    opacity: 0.35,
   },
 });

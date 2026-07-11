@@ -32,9 +32,9 @@ describe('HeroBanner', () => {
     const tree = await render(<HeroBanner onActionPress={onActionPress} />);
 
     const json = JSON.stringify(tree.toJSON());
-    expect(json).toContain('Limited Edition');
-    expect(json).toContain('Summer Collection');
-    expect(json).toContain('Shop the Look');
+    expect(json).toContain('Edición Limitada');
+    expect(json).toContain('Colección de Verano');
+    expect(json).toContain('Comprar el Look');
 
     const button = tree.root.findByProps({ accessibilityRole: 'button' });
     await ReactTestRenderer.act(() => button.props.onPress());
@@ -69,7 +69,7 @@ describe('ProductCard', () => {
     );
 
     const addButton = tree.root.findByProps({
-      accessibilityLabel: 'Add Summer Dress to cart',
+      accessibilityLabel: 'Agregar Summer Dress al carrito',
     });
     await ReactTestRenderer.act(() => addButton.props.onPress());
     await ReactTestRenderer.act(() => addButton.props.onPress());
@@ -86,14 +86,14 @@ describe('ProductCard', () => {
     );
 
     const heart = tree.root.findByProps({
-      accessibilityLabel: 'Add Summer Dress to wishlist',
+      accessibilityLabel: 'Agregar Summer Dress a favoritos',
     });
     expect(heart.props.accessibilityState).toEqual({});
 
     await ReactTestRenderer.act(() => heart.props.onPress());
     expect(
       tree.root.findByProps({
-        accessibilityLabel: 'Add Summer Dress to wishlist',
+        accessibilityLabel: 'Agregar Summer Dress a favoritos',
       }).props.accessibilityState,
     ).toEqual({ selected: true });
   });

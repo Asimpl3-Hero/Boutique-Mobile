@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Header, BAR_HEIGHT } from '@components/layout';
-import { SearchBar, Button } from '@components/ui';
-import { CategoryChips, HeroBanner, ProductCard } from '@components/features';
+import { Header, BAR_HEIGHT, WAVE_HEIGHT } from '@components/layout';
+import { Button, HangerIcon, ShirtIcon } from '@components/ui';
+import { CategoryCard, HeroBanner } from '@components/features';
 import { Skeleton } from '@components/ux';
 import {
   useAppDispatch,
@@ -13,11 +13,75 @@ import {
   selectProductsError,
   selectProductsStatus,
 } from '@store';
-import { spacing } from '@theme';
-import type { Product } from '@lib/services/products';
+import { colors, moderateScale, spacing } from '@theme';
 import { styles } from './Home.styles';
 
-const SKELETON_ROWS = 2;
+interface MosaicItem {
+  title: string;
+  backgroundColor: string;
+  titleColor: string;
+  underlineColor: string;
+  /** Optional — some tiles are icon+text, others text only (by design). */
+  Icon?: React.ComponentType<{ size?: number; color?: string }>;
+  /** Optional photo tile (wide rows). */
+  image?: number;
+}
+
+/** Home mosaic categories: photo tiles on wide rows, solid tiles on pairs. */
+const HOME_CATEGORIES: MosaicItem[] = [
+  {
+    title: 'Novedades',
+    backgroundColor: colors.primary,
+    titleColor: colors.onPrimary,
+    underlineColor: colors.accent,
+    image: require('@/assets/images/Sections/new-merch.jpg'),
+  },
+  {
+    title: 'Más Vendidos',
+    backgroundColor: colors.secondary,
+    titleColor: colors.onSecondary,
+    underlineColor: colors.accent,
+    Icon: HangerIcon,
+    image: require('@/assets/images/Sections/top-trending.jpg'),
+  },
+  {
+    title: 'Camisetas',
+    backgroundColor: colors.accent,
+    titleColor: colors.onPrimary,
+    underlineColor: colors.secondary,
+    Icon: ShirtIcon,
+    image: require('@/assets/images/Sections/shirts.jpg'),
+  },
+  {
+    title: 'Total Looks',
+    backgroundColor: colors.text,
+    titleColor: colors.onPrimary,
+    underlineColor: colors.secondary,
+    image: require('@/assets/images/Sections/total-looks.jpg'),
+  },
+];
+
+interface MosaicRow {
+  key: string;
+  items: MosaicItem[];
+}
+
+/** Bento pattern: alternating full-width row and half-and-half pair. */
+const buildMosaicRows = (items: MosaicItem[]): MosaicRow[] => {
+  const rows: MosaicRow[] = [];
+  let index = 0;
+  let wide = true;
+  while (index < items.length) {
+    const take = wide ? 1 : Math.min(2, items.length - index);
+    rows.push({
+      key: items[index].title,
+      items: items.slice(index, index + take),
+    });
+    index += take;
+    wide = !wide;
+  }
+  return rows;
+};
 
 /** Home: brand header, search, categories, hero and the product grid. */
 export const HomeScreen = () => {
@@ -26,7 +90,6 @@ export const HomeScreen = () => {
   const products = useAppSelector(selectProducts);
   const status = useAppSelector(selectProductsStatus);
   const error = useAppSelector(selectProductsError);
-  const [activeCategory, setActiveCategory] = useState('All');
 
   useEffect(() => {
     if (status === 'idle') {
@@ -39,37 +102,65 @@ export const HomeScreen = () => {
   }, [dispatch]);
 
   const renderItem = useCallback(
-    ({ item }: { item: Product }) => <ProductCard product={item} />,
+    ({ item }: { item: MosaicRow }) => (
+      <View style={styles.mosaicRow}>
+        {item.items.map(category => (
+          <View key={category.title} style={styles.mosaicCell}>
+            <CategoryCard
+              title={category.title}
+              backgroundColor={category.backgroundColor}
+              titleColor={category.titleColor}
+              underlineColor={category.underlineColor}
+              image={category.image}
+              icon={
+                category.Icon ? (
+                  <category.Icon
+                    size={moderateScale(28)}
+                    color={category.underlineColor}
+                  />
+                ) : undefined
+              }
+              variant={item.items.length === 1 ? 'wide' : 'half'}
+            />
+          </View>
+        ))}
+      </View>
+    ),
     [],
   );
 
   const listEmpty = () => {
     if (status === 'loading' || status === 'idle') {
+      // Skeletons mirror the mosaic: wide row, then a pair, then wide.
       return (
         <View accessibilityLabel="Loading products">
-          {Array.from({ length: SKELETON_ROWS }).map((_, row) => (
-            <View key={row} style={styles.skeletonRow}>
-              <Skeleton style={styles.skeletonCard} />
-              <Skeleton style={styles.skeletonCard} />
-            </View>
-          ))}
+          <View style={styles.skeletonRow}>
+            <Skeleton style={styles.skeletonWide} />
+          </View>
+          <View style={styles.skeletonRow}>
+            <Skeleton style={styles.skeletonCard} />
+            <Skeleton style={styles.skeletonCard} />
+          </View>
+          <View style={styles.skeletonRow}>
+            <Skeleton style={styles.skeletonWide} />
+          </View>
         </View>
       );
     }
     if (status === 'failed') {
       return (
         <View style={styles.stateContainer}>
-          <Text style={styles.stateTitle}>We couldn't load the catalog</Text>
+          <Text style={styles.stateTitle}>No pudimos cargar el catálogo</Text>
           <Text style={styles.stateCaption}>{error}</Text>
-          <Button label="Try again" onPress={retry} />
+          <Button label="Reintentar" onPress={retry} />
         </View>
       );
     }
     return (
       <View style={styles.stateContainer}>
-        <Text style={styles.stateTitle}>No products yet</Text>
+        <Text style={styles.stateTitle}>Aún no hay productos</Text>
         <Text style={styles.stateCaption}>
-          New arrivals are on their way — check back soon.
+          Las novedades están en camino — vuelve pronto.
         </Text>
       </View>
     );
@@ -79,34 +170,29 @@ export const HomeScreen = () => {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <Header />
       <FlatList
-        data={status === 'succeeded' ? products : []}
-        keyExtractor={item => item.id}
+        style={styles.list}
+        data={status === 'succeeded' ? buildMosaicRows(HOME_CATEGORIES) : []}
+        keyExtractor={row => row.key}
         renderItem={renderItem}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={[
           styles.listContent,
-          // Content must clear the floating tab bar and the home indicator.
-          { paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2 },
+          {
+            paddingTop: WAVE_HEIGHT,
+            // Content must clear the floating tab bar and the home indicator.
+            paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2,
+          },
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={listEmpty}
         ListHeaderComponent={
           <View style={styles.listHeader}>
             <View style={styles.padded}>
-              <SearchBar />
-            </View>
-            <CategoryChips
-              active={activeCategory}
-              onSelect={setActiveCategory}
-            />
-            <View style={styles.padded}>
               <HeroBanner />
             </View>
             <View style={styles.sectionRow}>
-              <Text style={styles.sectionTitle}>Trending Now</Text>
+              <Text style={styles.sectionTitle}>Categorías</Text>
               <Pressable accessibilityRole="button" hitSlop={spacing.sm}>
-                <Text style={styles.seeAll}>See All</Text>
+                <Text style={styles.seeAll}>Ver todo</Text>
               </Pressable>
             </View>
           </View>

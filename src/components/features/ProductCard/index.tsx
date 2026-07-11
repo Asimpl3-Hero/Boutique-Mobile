@@ -6,30 +6,45 @@ import { useAppDispatch, addItem } from '@store';
 import type { Product } from '@lib/services/products';
 import { styles } from './ProductCard.styles';
 
+export type ProductCardVariant = 'half' | 'wide';
+
 export interface ProductCardProps {
   product: Product;
+  /** 'half' for paired columns, 'wide' for full-width mosaic rows. */
+  variant?: ProductCardVariant;
+  /** Fired when the card body is pressed (e.g. open the product detail). */
+  onPress?: () => void;
 }
 
 // 32/36pt controls + hitSlop keep touch targets at ≥44pt.
 const HIT_SLOP = moderateScale(6);
 
 /** Catalog card: image, wishlist heart, name, price and add-to-cart. */
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  variant = 'half',
+  onPress,
+}: ProductCardProps) => {
   const dispatch = useAppDispatch();
   const [wishlisted, setWishlisted] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Ver ${product.name}`}
+      onPress={onPress}
+      style={styles.container}
+    >
       <View style={styles.imageWrapper}>
         <Image
           source={{ uri: product.imageUrl }}
-          style={styles.image}
+          style={variant === 'wide' ? styles.imageWide : styles.image}
           resizeMode="cover"
           accessibilityLabel={product.name}
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Add ${product.name} to wishlist`}
+          accessibilityLabel={`Agregar ${product.name} a favoritos`}
           accessibilityState={wishlisted ? { selected: true } : {}}
           hitSlop={HIT_SLOP}
           onPress={() => setWishlisted(current => !current)}
@@ -50,7 +65,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <Text style={styles.price}>{product.formattedPrice}</Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Add ${product.name} to cart`}
+            accessibilityLabel={`Agregar ${product.name} al carrito`}
             hitSlop={HIT_SLOP}
             onPress={() => dispatch(addItem(product))}
             style={styles.addButton}
@@ -59,6 +74,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </Pressable>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };

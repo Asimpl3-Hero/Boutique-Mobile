@@ -77,9 +77,13 @@ describe('HomeScreen', () => {
     const tree = await renderHome(makeStore());
     await flush();
 
-    expect(hasText(tree, 'Summer Dress')).toBe(true);
-    expect(hasText(tree, '$ 16.800')).toBe(true);
-    expect(hasText(tree, 'Trending Now')).toBe(true);
+    // Category mosaic (underlined Oi titles), no product names or prices.
+    expect(hasText(tree, 'Novedades')).toBe(true);
+    expect(hasText(tree, 'Más Vendidos')).toBe(true);
+    expect(hasText(tree, 'Camisetas')).toBe(true);
+    expect(hasText(tree, 'Total Looks')).toBe(true);
+    expect(hasText(tree, '$ 16.800')).toBe(false);
+    expect(hasText(tree, 'Categorías')).toBe(true);
     await ReactTestRenderer.act(() => tree.unmount());
   });
 
@@ -88,7 +92,7 @@ describe('HomeScreen', () => {
     const tree = await renderHome(makeStore());
     await flush();
 
-    expect(hasText(tree, "We couldn't load the catalog")).toBe(true);
+    expect(hasText(tree, 'No pudimos cargar el catálogo')).toBe(true);
     expect(hasText(tree, 'network down')).toBe(true);
 
     mockedFetch.mockResolvedValueOnce([product]);
@@ -96,7 +100,7 @@ describe('HomeScreen', () => {
       .findAll(node => node.props?.accessibilityRole === 'button')
       .find(
         node =>
-          node.findAll(child => child.props?.children === 'Try again').length >
+          node.findAll(child => child.props?.children === 'Reintentar').length >
           0,
       );
     expect(retry).toBeDefined();
@@ -104,7 +108,7 @@ describe('HomeScreen', () => {
     await flush();
 
     expect(mockedFetch).toHaveBeenCalledTimes(2);
-    expect(hasText(tree, 'Summer Dress')).toBe(true);
+    expect(hasText(tree, 'Novedades')).toBe(true);
     await ReactTestRenderer.act(() => tree.unmount());
   });
 });

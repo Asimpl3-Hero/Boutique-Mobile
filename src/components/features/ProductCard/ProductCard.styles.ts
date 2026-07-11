@@ -23,6 +23,10 @@ export const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 0.8,
   },
+  imageWide: {
+    width: '100%',
+    aspectRatio: 1.5,
+  },
   wishlist: {
     position: 'absolute',
     top: spacing.sm,

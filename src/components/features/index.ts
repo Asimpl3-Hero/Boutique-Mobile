@@ -2,3 +2,4 @@
 export * from './CategoryChips';
 export * from './HeroBanner';
 export * from './ProductCard';
+export * from './CategoryCard';

@@ -39,9 +39,9 @@ test('bootstrap starts on the splash and lands on the tab navigator', async () =
     await Promise.resolve();
   });
 
-  expect(hasText(tree, 'Home')).toBe(true);
+  expect(hasText(tree, 'Inicio')).toBe(true);
   expect(hasText(tree, 'Facturas')).toBe(true);
-  expect(hasText(tree, 'Trending Now')).toBe(true);
+  expect(hasText(tree, 'Categorías')).toBe(true);
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

@@ -14,7 +14,7 @@ export interface SearchBarProps {
 export const SearchBar = ({
   value,
   onChangeText,
-  placeholder = 'Search products',
+  placeholder = 'Buscar productos',
   editable = true,
 }: SearchBarProps) => (
   <View style={styles.container}>

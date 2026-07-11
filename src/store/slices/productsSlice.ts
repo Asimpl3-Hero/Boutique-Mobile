@@ -53,4 +53,10 @@ export const selectProductsStatus = (state: WithProducts): ProductsStatus =>
 export const selectProductsError = (state: WithProducts): string | null =>
   state.products.error;
 
+export const selectProductById = (
+  state: WithProducts,
+  productId: string,
+): Product | undefined =>
+  state.products.items.find(product => product.id === productId);
+
 export default productsSlice.reducer;

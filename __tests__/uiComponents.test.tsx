@@ -54,7 +54,7 @@ describe('SearchBar', () => {
     const tree = await render(<SearchBar onChangeText={onChangeText} />);
 
     const input = tree.root.findByProps({
-      accessibilityLabel: 'Search products',
+      accessibilityLabel: 'Buscar productos',
     });
     await ReactTestRenderer.act(() => input.props.onChangeText('dress'));
 
@@ -63,23 +63,17 @@ describe('SearchBar', () => {
 });
 
 describe('Header', () => {
-  test('renders the brand title and fires icon actions', async () => {
-    const onMenuPress = jest.fn();
+  test('renders the brand title and fires the bell action', async () => {
     const onBellPress = jest.fn();
-    const tree = await render(
-      <Header onMenuPress={onMenuPress} onBellPress={onBellPress} />,
-    );
+    const tree = await render(<Header onBellPress={onBellPress} />);
 
     expect(JSON.stringify(tree.toJSON())).toContain('BORCELLE');
 
-    const menu = tree.root.findByProps({ accessibilityLabel: 'Menu' });
-    const bell = tree.root.findByProps({ accessibilityLabel: 'Notifications' });
+    const bell = tree.root.findByProps({ accessibilityLabel: 'Notificaciones' });
     await ReactTestRenderer.act(() => {
-      menu.props.onPress();
       bell.props.onPress();
     });
 
-    expect(onMenuPress).toHaveBeenCalledTimes(1);
     expect(onBellPress).toHaveBeenCalledTimes(1);
   });
 });

@@ -6,6 +6,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 export type RootStackParamList = {
   Splash: undefined;
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
+  ProductDetail: { productId: string };
 };
 
 /** Bottom-tab routes. Cart is a FAB (mobile-05), not a tab; no auth/profile. */
