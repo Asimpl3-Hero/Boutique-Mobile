@@ -1,14 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import uiReducer from './slices/uiSlice';
+import productsReducer from './slices/productsSlice';
 
 /**
  * Global store (Redux Toolkit, Flux architecture).
- * One slice per domain under store/slices/; domain slices are registered
- * here as their tasks land (products/cart in mobile-03+).
+ * One slice per domain under store/slices/.
  */
 export const store = configureStore({
   reducer: {
     ui: uiReducer,
+    products: productsReducer,
   },
 });
 
@@ -17,3 +18,4 @@ export type AppDispatch = typeof store.dispatch;
 
 export * from './hooks';
 export * from './slices/uiSlice';
+export * from './slices/productsSlice';
