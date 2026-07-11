@@ -12,3 +12,4 @@ export * from './HangerIcon';
 export * from './ShirtIcon';
 export * from './SparkleIcon';
 export * from './FlameIcon';
+export * from './CheckIcon';
