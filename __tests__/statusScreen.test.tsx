@@ -46,7 +46,7 @@ describe('StatusScreen', () => {
     await ReactTestRenderer.act(() => tree.unmount());
   });
 
-  test('success: green reveal, done icon and continue action', async () => {
+  test('success: green reveal, no bar/buttons, auto-closes', async () => {
     const onDone = jest.fn();
     const tree = await render(
       <StatusScreen visible state="success" onDone={onDone} />,
@@ -54,15 +54,15 @@ describe('StatusScreen', () => {
 
     expect(revealColor(tree)).toBe(colors.success);
     expect(hasText(tree, '¡Todo listo!')).toBe(true);
+    // The celebration is clean: no progress bar, no continue button.
+    expect(
+      tree.root.findAllByProps({ accessibilityRole: 'progressbar' }).length,
+    ).toBe(0);
+    expect(hasText(tree, 'Continuar')).toBe(false);
 
-    const done = tree.root
-      .findAll(node => node.props?.accessibilityRole === 'button')
-      .find(
-        node =>
-          node.findAll(child => child.props?.children === 'Continuar')
-            .length > 0,
-      );
-    await ReactTestRenderer.act(() => done!.props.onPress());
+    await ReactTestRenderer.act(() => {
+      jest.advanceTimersByTime(2600);
+    });
     expect(onDone).toHaveBeenCalled();
 
     await ReactTestRenderer.act(() => tree.unmount());

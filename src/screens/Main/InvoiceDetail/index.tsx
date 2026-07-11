@@ -1,0 +1,205 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Easing,
+  Image,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
+import { Header } from '@components/layout';
+import { formatPrice } from '@lib';
+import { colors, moderateScale } from '@theme';
+import type { InvoicesStackScreenProps } from '@/navigation';
+import { formatInvoiceDate, invoiceNumber } from '../Invoices';
+import { styles } from './InvoiceDetail.styles';
+
+// Grayscale variant: tintColor would flatten the artwork to a blob.
+const LOGO = require('@/assets/images/logos/app-icon-bw.png');
+
+/** Receipt torn edge: a strip of downward triangles closing the card. */
+const TEETH = 18;
+const TOOTH_WIDTH = 20;
+const TORN_PATH = `M0 0 ${Array.from(
+  { length: TEETH },
+  (_, index) =>
+    `L${index * TOOTH_WIDTH + TOOTH_WIDTH / 2} 12 L${
+      (index + 1) * TOOTH_WIDTH
+    } 0`,
+).join(' ')} Z`;
+
+/** Backdrop mood colors cycled softly behind the white receipt. */
+const BACKDROP_PALETTE: string[] = [
+  colors.primary,
+  colors.secondary,
+  colors.accent,
+  colors.success,
+];
+
+const pickNext = (current: string): string => {
+  const options = BACKDROP_PALETTE.filter(color => color !== current);
+  return options[Math.floor(Math.random() * options.length)];
+};
+
+type InvoiceDetailProps = InvoicesStackScreenProps<'InvoiceDetail'>;
+
+/** Invoice render: brand-styled receipt with the purchase line items. */
+export const InvoiceDetailScreen = ({
+  route,
+  navigation,
+}: InvoiceDetailProps) => {
+  const { transaction } = route.params;
+  const approved = transaction.status === 'APPROVED';
+  const shipping = transaction.shipping;
+
+  // Soft random color drift behind the receipt.
+  const blend = useRef(new Animated.Value(0)).current;
+  const [pair, setPair] = useState({
+    from: BACKDROP_PALETTE[0],
+    to: BACKDROP_PALETTE[1],
+  });
+
+  useEffect(() => {
+    blend.setValue(0);
+    const animation = Animated.timing(blend, {
+      toValue: 1,
+      duration: 3500,
+      easing: Easing.inOut(Easing.ease),
+      // Color interpolation cannot run on the native driver.
+      useNativeDriver: false,
+    });
+    animation.start(({ finished }) => {
+      if (finished) {
+        setPair(current => ({ from: current.to, to: pickNext(current.to) }));
+      }
+    });
+    return () => animation.stop();
+  }, [pair, blend]);
+
+  const backdrop = blend.interpolate({
+    inputRange: [0, 1],
+    outputRange: [pair.from, pair.to],
+  });
+
+  return (
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.backdrop, { backgroundColor: backdrop }]}
+      />
+      <Header onBackPress={() => navigation.goBack()} />
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        <View>
+          <View style={styles.card}>
+            <Image
+              source={LOGO}
+              style={styles.logo}
+              resizeMode="contain"
+              accessibilityLabel="Borcelle"
+            />
+            <View style={styles.titleRow}>
+              <Text style={styles.titleText}>FACTURA</Text>
+              <Text style={styles.number}>{invoiceNumber(transaction)}</Text>
+            </View>
+            <Text style={styles.date}>
+              {formatInvoiceDate(transaction.createdAt)}
+            </Text>
+            <View
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: approved ? colors.success : colors.error,
+                },
+              ]}
+            >
+              <Text style={styles.statusBadgeText}>
+                {approved ? 'APROBADA' : 'RECHAZADA'}
+              </Text>
+            </View>
+
+            <View>
+              <Text style={styles.shippingLabel}>ENVÍO</Text>
+              {shipping ? (
+                <>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>A nombre de</Text>
+                    <Text style={styles.infoValue} numberOfLines={1}>
+                      {shipping.fullName}
+                    </Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Dirección</Text>
+                    <Text style={styles.infoValue} numberOfLines={2}>
+                      {`${
+                        shipping.address2
+                          ? `${shipping.address1}, ${shipping.address2}`
+                          : shipping.address1
+                      }\n${shipping.city}, ${shipping.state} · ${shipping.zip}`}
+                    </Text>
+                  </View>
+                </>
+              ) : null}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Tarjeta</Text>
+                <Text style={styles.infoValue}>
+                  {`•••• ${transaction.cardLastFour}`}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.details}>
+              <View style={styles.headerRow}>
+                <Text style={[styles.headerCell, styles.cellProduct]}>
+                  PRODUCTO
+                </Text>
+                <Text style={[styles.headerCell, styles.cellUnit]}>CANT</Text>
+                <Text style={[styles.headerCell, styles.cellPrice]}>
+                  PRECIO
+                </Text>
+              </View>
+              {transaction.items.map((item, index) => (
+                <View key={`${item.name}-${index}`} style={styles.row}>
+                  <Text
+                    style={[styles.cellText, styles.cellProduct]}
+                    numberOfLines={1}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text style={[styles.cellText, styles.cellUnit]}>
+                    {item.quantity}
+                  </Text>
+                  <Text style={[styles.cellText, styles.cellPrice]}>
+                    {formatPrice(
+                      item.priceInCents * item.quantity,
+                      item.currency,
+                    )}
+                  </Text>
+                </View>
+              ))}
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>
+                  {formatPrice(transaction.amountInCents)}
+                </Text>
+              </View>
+            </View>
+
+          </View>
+          <Svg
+            pointerEvents="none"
+            style={styles.tornEdge}
+            viewBox={`0 0 ${TEETH * TOOTH_WIDTH} 12`}
+            preserveAspectRatio="none"
+          >
+            <Path d={TORN_PATH} fill={colors.surface} />
+          </Svg>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};

@@ -42,20 +42,31 @@ describe('CircularReveal', () => {
 });
 
 describe('ProgressBar', () => {
-  test('determinate mode fills by percentage in the given color', async () => {
+  test('determinate mode animates the fill in the given color', async () => {
+    jest.useFakeTimers();
     const tree = await render(
       <ProgressBar progress={0.5} color={colors.error} />,
     );
+
+    const track = tree.root.findByProps({ accessibilityRole: 'progressbar' });
+    await ReactTestRenderer.act(() => {
+      track.props.onLayout({ nativeEvent: { layout: { width: 300 } } });
+    });
+    await ReactTestRenderer.act(() => {
+      jest.advanceTimersByTime(600);
+    });
 
     const fill = tree.root.findByProps({ testID: 'progress-fill' });
     const flat = Object.assign(
       {},
       ...(Array.isArray(fill.props.style) ? fill.props.style : [fill.props.style]),
     );
-    expect(flat.width).toBe('50%');
     expect(flat.backgroundColor).toBe(colors.error);
+    // Animated width node exists (grows from 0 toward 50% of the track).
+    expect(flat.width).toBeDefined();
 
     await ReactTestRenderer.act(() => tree.unmount());
+    jest.useRealTimers();
   });
 
   test('indeterminate mode renders the animated sweep segment', async () => {

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Header, BAR_HEIGHT, WAVE_PATH } from '@components/layout';
-import { Button, ShieldIcon, TruckIcon } from '@components/ui';
+import { Button, CheckIcon, ShieldIcon, TruckIcon } from '@components/ui';
 import { PerkBadge } from '@components/ux';
 import { useAppDispatch, useAppSelector, addItem, selectProductById } from '@store';
 import { colors, moderateScale, spacing } from '@theme';
@@ -22,6 +22,9 @@ const FINISH_SWATCHES = [
   colors.success,
 ];
 
+/** How long the add button stays locked showing the success feedback. */
+const ADDED_FEEDBACK_MS = 1000;
+
 type ProductDetailProps = HomeStackScreenProps<'ProductDetail'>;
 
 /** Product detail: large image, story copy and add-to-cart (flow screen 3). */
@@ -37,11 +40,36 @@ export const ProductDetailScreen = ({
   const [selectedFinish, setSelectedFinish] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
+  const addedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (addedTimer.current) {
+        clearTimeout(addedTimer.current);
+      }
+    },
+    [],
+  );
+
+  const handleAdd = () => {
+    if (justAdded || !product) {
+      return;
+    }
+    for (let unit = 0; unit < quantity; unit += 1) {
+      dispatch(addItem(product));
+    }
+    setJustAdded(true);
+    addedTimer.current = setTimeout(
+      () => setJustAdded(false),
+      ADDED_FEEDBACK_MS,
+    );
+  };
 
   if (!product) {
     // Resilient fallback: never crash on a stale/unknown id.
     return (
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.container} edges={['left', 'right']}>
         <Header onBackPress={() => navigation.goBack()} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>
@@ -57,7 +85,7 @@ export const ProductDetailScreen = ({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <Header onBackPress={() => navigation.goBack()} />
       <ScrollView
         style={styles.scroll}
@@ -181,17 +209,23 @@ export const ProductDetailScreen = ({
           </View>
           <Button
             label={
-              quantity > 1
-                ? `Añadir ${quantity} al Carrito`
-                : 'Añadir al Carrito'
+              justAdded
+                ? 'Añadido al carrito'
+                : quantity > 1
+                  ? `Añadir ${quantity} al Carrito`
+                  : 'Añadir al Carrito'
+            }
+            icon={
+              justAdded ? (
+                <CheckIcon
+                  size={moderateScale(18)}
+                  color={colors.onPrimary}
+                />
+              ) : undefined
             }
             disabled={product.stock === 0}
-            onPress={() => {
-              for (let unit = 0; unit < quantity; unit += 1) {
-                dispatch(addItem(product));
-              }
-            }}
-            style={styles.addButton}
+            onPress={handleAdd}
+            style={[styles.addButton, justAdded && styles.addButtonSuccess]}
           />
         </View>
       </ScrollView>

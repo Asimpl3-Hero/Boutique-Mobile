@@ -20,7 +20,7 @@ import {
   validateRequired,
   type CardBrand,
 } from '@lib';
-import { spacing } from '@theme';
+import { colors, spacing } from '@theme';
 import { styles } from '../Checkout.styles';
 
 export interface TokenizedCardSummary {
@@ -43,6 +43,13 @@ const BRAND_LABEL: Record<CardBrand, string> = {
   visa: 'VISA',
   mastercard: 'MASTERCARD',
   unknown: 'TARJETA',
+};
+
+/** Badge tint per detected brand (navy fallback while unknown). */
+const BRAND_BADGE: Record<CardBrand, { bg: string; fg: string }> = {
+  visa: { bg: colors.primary, fg: colors.onPrimary },
+  mastercard: { bg: colors.accent, fg: colors.onAccent },
+  unknown: { bg: colors.text, fg: colors.onPrimary },
 };
 
 /** Sandbox test cards from the payments provider (approve / decline). */
@@ -162,8 +169,18 @@ export const CardStep = ({
             <Text style={styles.cardSummaryText}>
               {`•••• ${card.lastFour}`}
             </Text>
-            <View style={styles.brandBadge}>
-              <Text style={styles.brandBadgeText}>
+            <View
+              style={[
+                styles.brandBadge,
+                { backgroundColor: BRAND_BADGE[card.brand].bg },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.brandBadgeText,
+                  { color: BRAND_BADGE[card.brand].fg },
+                ]}
+              >
                 {BRAND_LABEL[card.brand]}
               </Text>
             </View>
@@ -188,7 +205,8 @@ export const CardStep = ({
       >
         <KeyboardAvoidingView
           style={styles.backdropScrim}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          // Android too: the panel must rise above the numeric keyboard.
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <Pressable
             accessibilityLabel="Cerrar formulario de tarjeta"
@@ -204,8 +222,20 @@ export const CardStep = ({
             <View style={styles.backdropHandle} />
             <View style={styles.summaryRow}>
               <Text style={styles.backdropTitle}>Datos de tarjeta</Text>
-              <View style={styles.brandBadge}>
-                <Text style={styles.brandBadgeText}>{BRAND_LABEL[brand]}</Text>
+              <View
+                style={[
+                  styles.brandBadge,
+                  { backgroundColor: BRAND_BADGE[brand].bg },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.brandBadgeText,
+                    { color: BRAND_BADGE[brand].fg },
+                  ]}
+                >
+                  {BRAND_LABEL[brand]}
+                </Text>
               </View>
             </View>
             <View style={styles.fieldRow}>

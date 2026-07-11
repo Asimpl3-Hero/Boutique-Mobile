@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
-import { Platform, ScrollView, ToastAndroid, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  ToastAndroid,
+  View,
+} from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header } from '@components/layout';
 import { Button } from '@components/ui';
@@ -20,10 +26,11 @@ import {
 } from '@store';
 import {
   buildOrderRequests,
-  saveLastTransaction,
+  saveTransaction,
   validateEmail,
   validateOptionalPhone,
   validateRequired,
+  type StoredTransaction,
 } from '@lib';
 import { spacing } from '@theme';
 import type { RootStackScreenProps } from '@/navigation';
@@ -111,6 +118,8 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
   const card = cards[selectedCard] ?? null;
   const flowStatus = useAppSelector(selectOrderFlowStatus);
   const flowError = useAppSelector(selectOrderError);
+  // Last stored purchase: the success flow lands on its invoice.
+  const lastTransaction = useRef<StoredTransaction | null>(null);
 
   const notify = (message: string) => {
     if (Platform.OS === 'android') {
@@ -128,16 +137,36 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
       shipping,
       card.cardToken,
     );
+    // Snapshot before the cart clears on approval.
+    const itemsSnapshot = items.map(item => ({
+      name: item.product.name,
+      quantity: item.quantity,
+      priceInCents: item.product.priceInCents,
+      currency: item.product.currency,
+    }));
     try {
       const result = await dispatch(submitOrders({ requests })).unwrap();
       // PDF requirement: persist the transaction encrypted — never the PAN.
-      await saveLastTransaction({
+      const transaction: StoredTransaction = {
         orderIds: result.orderIds,
         status: result.finalStatus,
         amountInCents: total,
         cardLastFour: card.lastFour,
         createdAt: new Date().toISOString(),
-      });
+        items: itemsSnapshot,
+        shipping: {
+          fullName: shipping.fullName.trim(),
+          address1: shipping.address1.trim(),
+          ...(shipping.address2.trim()
+            ? { address2: shipping.address2.trim() }
+            : {}),
+          city: shipping.city.trim(),
+          state: shipping.state.trim(),
+          zip: shipping.zip.trim(),
+        },
+      };
+      await saveTransaction(transaction);
+      lastTransaction.current = transaction;
       if (result.finalStatus === 'APPROVED') {
         dispatch(clear());
       } else {
@@ -153,8 +182,23 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
   };
 
   const closeStatus = () => {
+    const approvedTransaction =
+      flowStatus === 'approved' ? lastTransaction.current : null;
     dispatch(resetOrderFlow());
-    // Back to Home (step 7 of the flow).
+    if (approvedTransaction) {
+      // Success lands on the freshly issued invoice, not the list.
+      // initial:false keeps InvoicesMain beneath so back goes to it.
+      navigation.popTo('Main', {
+        screen: 'Invoices',
+        params: {
+          screen: 'InvoiceDetail',
+          params: { transaction: approvedTransaction },
+          initial: false,
+        },
+      });
+      return;
+    }
+    // Declined/error: back to where checkout was opened.
     navigation.goBack();
   };
 
@@ -197,11 +241,17 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
     (step === 0 && items.length === 0) || (step === 2 && card === null);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <Header onBackPress={() => navigation.goBack()} />
       <View style={styles.stepper}>
         <Stepper steps={STEPS} current={step} />
       </View>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        // Edge-to-edge Android ignores adjustResize: compensate manually
+        // on both platforms.
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -281,6 +331,7 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
           />
         )}
       </View>
+      </KeyboardAvoidingView>
       <StatusScreen
         visible={flowStatus !== 'idle'}
         state={
@@ -292,7 +343,7 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
         }
         title={
           flowStatus === 'approved'
-            ? '¡Pago aprobado!'
+            ? '¡Compra realizada!'
             : flowStatus === 'declined'
               ? 'Pago rechazado'
               : flowStatus === 'error'

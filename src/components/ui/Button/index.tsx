@@ -9,6 +9,8 @@ export interface ButtonProps {
   onPress?: () => void;
   variant?: ButtonVariant;
   disabled?: boolean;
+  /** Optional leading adornment (e.g. a success check). */
+  icon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -29,6 +31,7 @@ export const Button = ({
   onPress,
   variant = 'primary',
   disabled = false,
+  icon,
   style,
 }: ButtonProps) => (
   <Pressable
@@ -38,6 +41,7 @@ export const Button = ({
     onPress={onPress}
     style={[styles.base, variantStyle[variant], disabled && styles.disabled, style]}
   >
+    {icon ?? null}
     <Text style={[styles.label, labelStyle[variant]]}>{label}</Text>
   </Pressable>
 );

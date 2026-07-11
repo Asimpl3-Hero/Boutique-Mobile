@@ -20,7 +20,8 @@ export const CircularReveal = ({
   onFinish,
 }: CircularRevealProps) => {
   const { width, height } = useWindowDimensions();
-  const scale = useRef(new Animated.Value(active ? 1 : 0)).current;
+  // Always born collapsed so mounting with `active` animates the reveal.
+  const scale = useRef(new Animated.Value(0)).current;
 
   // Covers every corner regardless of aspect ratio.
   const diameter = Math.ceil(Math.hypot(width, height));

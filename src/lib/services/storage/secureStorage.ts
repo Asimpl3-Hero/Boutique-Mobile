@@ -1,5 +1,23 @@
 import * as Keychain from 'react-native-keychain';
 
+/** Line item snapshot for the invoice render. */
+export interface StoredTransactionItem {
+  name: string;
+  quantity: number;
+  priceInCents: number;
+  currency: string;
+}
+
+/** Shipping snapshot shown on the invoice (no sensitive data). */
+export interface StoredShipping {
+  fullName: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
 /**
  * Transaction record persisted after checkout (PDF requirement: encrypted
  * storage). NEVER the card number — only token reference, status and ids.
@@ -10,29 +28,46 @@ export interface StoredTransaction {
   amountInCents: number;
   cardLastFour: string;
   createdAt: string;
+  items: StoredTransactionItem[];
+  /** Optional: older records predate this field. */
+  shipping?: StoredShipping;
 }
 
 const SERVICE = 'boutique.transactions';
+/** Newest first, capped to keep the encrypted payload small. */
+const MAX_TRANSACTIONS = 50;
 
-/** Saves the last transaction in OS-encrypted storage (Keystore-backed). */
-export const saveLastTransaction = async (
+const readAll = async (): Promise<StoredTransaction[]> => {
+  const stored = await Keychain.getGenericPassword({ service: SERVICE });
+  if (!stored) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(stored.password);
+    return Array.isArray(parsed) ? (parsed as StoredTransaction[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+/** Appends a transaction to the encrypted history (newest first). */
+export const saveTransaction = async (
   transaction: StoredTransaction,
 ): Promise<void> => {
-  await Keychain.setGenericPassword(SERVICE, JSON.stringify(transaction), {
+  const history = await readAll();
+  const next = [transaction, ...history].slice(0, MAX_TRANSACTIONS);
+  await Keychain.setGenericPassword(SERVICE, JSON.stringify(next), {
     service: SERVICE,
   });
 };
 
-/** Reads the last stored transaction, or null when none/corrupted. */
+/** Full purchase history from OS-encrypted storage (Keystore-backed). */
+export const getTransactions = async (): Promise<StoredTransaction[]> =>
+  readAll();
+
+/** Latest stored transaction, or null when none. */
 export const getLastTransaction =
   async (): Promise<StoredTransaction | null> => {
-    const stored = await Keychain.getGenericPassword({ service: SERVICE });
-    if (!stored) {
-      return null;
-    }
-    try {
-      return JSON.parse(stored.password) as StoredTransaction;
-    } catch {
-      return null;
-    }
+    const [latest] = await readAll();
+    return latest ?? null;
   };

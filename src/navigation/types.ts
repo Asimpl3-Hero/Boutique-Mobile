@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
+import type { StoredTransaction } from '@lib/services/storage';
 
 /** Root stack: Splash boots the app, Main hosts the tabs, Cart is the
  *  checkout takeover (the only surface without tab bar / FAB). */
@@ -26,11 +27,17 @@ export type HomeStackParamList = {
   };
 };
 
+/** Stack nested in the Invoices tab: purchase list + invoice render. */
+export type InvoicesStackParamList = {
+  InvoicesMain: undefined;
+  InvoiceDetail: { transaction: StoredTransaction };
+};
+
 /** Bottom-tab routes. Cart is a FAB, not a tab; no auth/profile. */
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList> | undefined;
   Search: undefined;
-  Invoices: undefined;
+  Invoices: NavigatorScreenParams<InvoicesStackParamList> | undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -38,6 +45,9 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type HomeStackScreenProps<T extends keyof HomeStackParamList> =
   NativeStackScreenProps<HomeStackParamList, T>;
+
+export type InvoicesStackScreenProps<T extends keyof InvoicesStackParamList> =
+  NativeStackScreenProps<InvoicesStackParamList, T>;
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> =
   BottomTabScreenProps<RootTabParamList, T>;

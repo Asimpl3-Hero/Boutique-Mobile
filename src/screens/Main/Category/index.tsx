@@ -34,7 +34,7 @@ export const CategoryScreen = ({ route, navigation }: CategoryProps) => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <Header onBackPress={() => navigation.goBack()} />
       <FlatList
         style={styles.list}

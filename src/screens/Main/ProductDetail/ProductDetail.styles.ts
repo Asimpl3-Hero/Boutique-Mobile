@@ -148,6 +148,9 @@ export const styles = StyleSheet.create({
   addButton: {
     marginTop: spacing.xl,
   },
+  addButtonSuccess: {
+    backgroundColor: colors.success,
+  },
   perksRow: {
     flexDirection: 'row',
     gap: spacing.md,
