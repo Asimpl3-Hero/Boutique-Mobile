@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Platform, ScrollView, ToastAndroid, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header } from '@components/layout';
 import { Button } from '@components/ui';
-import { Stepper } from '@components/ux';
+import { StatusScreen, Stepper } from '@components/ux';
 import {
   useAppDispatch,
   useAppSelector,
   addItem,
+  clear,
   removeItem,
   removeLine,
+  resetOrderFlow,
   selectCartItems,
   selectCartTotal,
+  selectOrderError,
+  selectOrderFlowStatus,
+  submitOrders,
 } from '@store';
 import {
+  buildOrderRequests,
+  saveLastTransaction,
   validateEmail,
   validateOptionalPhone,
   validateRequired,
@@ -100,6 +107,54 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
   const [shipping, setShipping] = useState<ShippingFormValues>(EMPTY_SHIPPING);
   const [errors, setErrors] = useState<ShippingErrors>({});
   const [card, setCard] = useState<TokenizedCardSummary | null>(null);
+  const flowStatus = useAppSelector(selectOrderFlowStatus);
+  const flowError = useAppSelector(selectOrderError);
+
+  const notify = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.LONG);
+    }
+  };
+
+  const handlePay = async () => {
+    if (!card || items.length === 0) {
+      return;
+    }
+    const requests = buildOrderRequests(
+      items,
+      customerEmail,
+      shipping,
+      card.cardToken,
+    );
+    try {
+      const result = await dispatch(submitOrders({ requests })).unwrap();
+      // PDF requirement: persist the transaction encrypted — never the PAN.
+      await saveLastTransaction({
+        orderIds: result.orderIds,
+        status: result.finalStatus,
+        amountInCents: total,
+        cardLastFour: card.lastFour,
+        createdAt: new Date().toISOString(),
+      });
+      if (result.finalStatus === 'APPROVED') {
+        dispatch(clear());
+      } else {
+        notify('Pago rechazado. Intenta con otro medio de pago.');
+      }
+    } catch (error) {
+      notify(
+        error instanceof Error
+          ? error.message
+          : 'No pudimos procesar el pago',
+      );
+    }
+  };
+
+  const closeStatus = () => {
+    dispatch(resetOrderFlow());
+    // Back to Home (step 7 of the flow).
+    navigation.goBack();
+  };
 
   const goBack = () => {
     if (step === 0) {
@@ -186,10 +241,44 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
             style={styles.navButton}
           />
         ) : (
-          // Payment submission is wired in the final block of mobile-05.
-          <Button label="Pagar" disabled style={styles.navButton} />
+          <Button
+            label="Pagar"
+            onPress={handlePay}
+            disabled={card === null || items.length === 0}
+            style={styles.navButton}
+          />
         )}
       </View>
+      <StatusScreen
+        visible={flowStatus !== 'idle'}
+        status={
+          flowStatus === 'approved'
+            ? 'done'
+            : flowStatus === 'declined' || flowStatus === 'error'
+              ? 'denied'
+              : 'loading'
+        }
+        title={
+          flowStatus === 'approved'
+            ? '¡Pago aprobado!'
+            : flowStatus === 'declined'
+              ? 'Pago rechazado'
+              : flowStatus === 'error'
+                ? 'Algo salió mal'
+                : 'Procesando tu pago…'
+        }
+        message={
+          flowStatus === 'approved'
+            ? 'Tu orden fue creada con éxito.'
+            : flowStatus === 'declined'
+              ? 'Tu banco rechazó la transacción. Intenta con otra tarjeta.'
+              : flowStatus === 'error'
+                ? flowError ?? undefined
+                : 'No cierres la app.'
+        }
+        actionLabel="Volver al inicio"
+        onAction={closeStatus}
+      />
     </SafeAreaView>
   );
 };

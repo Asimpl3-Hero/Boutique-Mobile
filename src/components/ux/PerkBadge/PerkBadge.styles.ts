@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, spacing, typography } from '@theme';
+import { colors, moderateScale, radius, spacing, typography } from '@theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -24,6 +24,8 @@ export const styles = StyleSheet.create({
   },
   body: {
     ...typography.caption,
+    fontSize: moderateScale(10),
+    lineHeight: moderateScale(14),
     color: colors.textMuted,
   },
 });

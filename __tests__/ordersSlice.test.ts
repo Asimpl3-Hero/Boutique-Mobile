@@ -6,6 +6,7 @@ import ordersReducer, {
   selectOrderError,
   selectOrderFlowStatus,
   selectOrderId,
+  submitOrders,
 } from '@store/slices/ordersSlice';
 import {
   ordersService,
@@ -104,6 +105,63 @@ describe('ordersSlice', () => {
     expect(mockedGet).toHaveBeenCalledTimes(3);
     expect(selectOrderFlowStatus(store.getState())).toBe('error');
     expect(selectOrderError(store.getState())).toContain('pendiente');
+  });
+
+  test('submitOrders approves when every order approves', async () => {
+    mockedCreate
+      .mockResolvedValueOnce({ orderId: 'o-1', checkoutUrl: null, status: 'PENDING' })
+      .mockResolvedValueOnce({ orderId: 'o-2', checkoutUrl: null, status: 'APPROVED' });
+    mockedGet.mockResolvedValueOnce({ id: 'o-1', status: 'APPROVED' });
+    const store = makeStore();
+
+    const result = await store
+      .dispatch(
+        submitOrders({ requests: [request, request], intervalMs: 0 }),
+      )
+      .unwrap();
+
+    expect(result).toEqual({
+      finalStatus: 'APPROVED',
+      orderIds: ['o-1', 'o-2'],
+    });
+    expect(mockedCreate).toHaveBeenCalledTimes(2);
+    expect(selectOrderFlowStatus(store.getState())).toBe('approved');
+  });
+
+  test('submitOrders stops on the first decline', async () => {
+    mockedCreate.mockResolvedValueOnce({
+      orderId: 'o-1',
+      checkoutUrl: null,
+      status: 'PENDING',
+    });
+    mockedGet.mockResolvedValueOnce({ id: 'o-1', status: 'DECLINED' });
+    const store = makeStore();
+
+    const result = await store
+      .dispatch(
+        submitOrders({ requests: [request, request], intervalMs: 0 }),
+      )
+      .unwrap();
+
+    expect(result.finalStatus).toBe('DECLINED');
+    expect(mockedCreate).toHaveBeenCalledTimes(1);
+    expect(selectOrderFlowStatus(store.getState())).toBe('declined');
+  });
+
+  test('submitOrders times out into error when stuck pending', async () => {
+    mockedCreate.mockResolvedValueOnce({
+      orderId: 'o-1',
+      checkoutUrl: null,
+      status: 'PENDING',
+    });
+    mockedGet.mockResolvedValue({ id: 'o-1', status: 'PENDING' });
+    const store = makeStore();
+
+    await store.dispatch(
+      submitOrders({ requests: [request], intervalMs: 0, maxAttempts: 2 }),
+    );
+
+    expect(selectOrderFlowStatus(store.getState())).toBe('error');
   });
 
   test('resetOrderFlow returns to idle', async () => {

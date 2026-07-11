@@ -84,6 +84,20 @@ export const ProductDetailScreen = ({
               : 'Agotado'}
           </Text>
           <Text style={styles.description}>{product.description}</Text>
+          <View style={styles.perksRow}>
+            <PerkBadge
+              icon={
+                <ShieldIcon size={moderateScale(20)} color={colors.text} />
+              }
+              title="Garantía"
+              text="Si no te vuela la cabeza, te devolvemos tu dinero."
+            />
+            <PerkBadge
+              icon={<TruckIcon size={moderateScale(20)} color={colors.text} />}
+              title="Envíos"
+              text="Entregas rápidas a todo el país. Tu estilo no puede esperar."
+            />
+          </View>
           <Text style={styles.sectionLabel}>Acabado</Text>
           <View style={styles.swatchRow}>
             {FINISH_SWATCHES.map((swatch, index) => (
@@ -167,20 +181,6 @@ export const ProductDetailScreen = ({
             }}
             style={styles.addButton}
           />
-          <View style={styles.perksRow}>
-            <PerkBadge
-              icon={
-                <ShieldIcon size={moderateScale(20)} color={colors.text} />
-              }
-              title="Garantía"
-              text="Si no te vuela la cabeza, te devolvemos tu dinero."
-            />
-            <PerkBadge
-              icon={<TruckIcon size={moderateScale(20)} color={colors.text} />}
-              title="Envíos"
-              text="Entregas rápidas a todo el país. Tu estilo no puede esperar."
-            />
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

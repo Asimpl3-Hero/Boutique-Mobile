@@ -12,6 +12,20 @@ jest.mock('@react-native-community/blur', () => {
   return { BlurView: View };
 });
 
+// Keystore-backed storage isn't available under Jest — in-memory fake.
+jest.mock('react-native-keychain', () => {
+  const vault = new Map();
+  return {
+    setGenericPassword: jest.fn(async (username, password, options) => {
+      vault.set(options?.service ?? 'default', { username, password });
+      return { service: options?.service ?? 'default', storage: 'mock' };
+    }),
+    getGenericPassword: jest.fn(async options => {
+      return vault.get(options?.service ?? 'default') ?? false;
+    }),
+  };
+});
+
 // Native env module isn't available under Jest — provide the test values.
 jest.mock('react-native-config', () => ({
   API_URL: 'http://localhost:3000',
