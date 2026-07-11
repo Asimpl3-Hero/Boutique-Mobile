@@ -7,12 +7,16 @@ export const styles = StyleSheet.create({
     // Splash is plain white by design (logo asset sits on white).
     backgroundColor: colors.surface,
     alignItems: 'center',
-    justifyContent: 'center',
     paddingHorizontal: spacing.container,
-    gap: spacing.lg,
+  },
+  logoArea: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   version: {
     ...typography.caption,
     color: colors.text,
+    marginBottom: spacing.xl,
   },
 });

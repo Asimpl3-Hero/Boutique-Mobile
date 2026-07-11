@@ -1,9 +1,12 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Base application theme. Light-only on purpose: the app's design is
+         light (white surfaces, BORCELLE palette), so the pre-JS window stays
+         white instead of following the device dark theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
 </resources>
