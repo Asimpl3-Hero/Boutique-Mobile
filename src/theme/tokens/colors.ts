@@ -25,10 +25,11 @@ export const colors = {
   border: '#E0E5F9',
   muted: '#F1F0FA',
 
-  // Feedback
+  // Feedback (state semantics: success is green, error is red — always)
   error: '#E5484D',
   onError: '#FFFFFF',
   success: '#2E9E6B',
+  onSuccess: '#FFFFFF',
 } as const;
 
 export type ColorToken = keyof typeof colors;

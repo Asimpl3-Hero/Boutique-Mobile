@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Header, BAR_HEIGHT } from '@components/layout';
+import Svg, { Path } from 'react-native-svg';
+import { Header, BAR_HEIGHT, WAVE_PATH } from '@components/layout';
 import { Button, ShieldIcon, TruckIcon } from '@components/ui';
 import { PerkBadge } from '@components/ux';
 import { useAppDispatch, useAppSelector, addItem, selectProductById } from '@store';
@@ -66,12 +67,23 @@ export const ProductDetailScreen = ({
           paddingBottom: BAR_HEIGHT + insets.bottom + spacing.xl * 2,
         }}
       >
-        <Image
-          source={{ uri: product.imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-          accessibilityLabel={product.name}
-        />
+        <View style={styles.imageWrap}>
+          <Image
+            source={{ uri: product.imageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+            accessibilityLabel={product.name}
+          />
+          {/* Same brand wave as the header, rising from the photo's base. */}
+          <Svg
+            pointerEvents="none"
+            style={styles.imageWave}
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+          >
+            <Path d={WAVE_PATH} fill={colors.background} />
+          </Svg>
+        </View>
         <View style={styles.content}>
           <View style={styles.eyebrowRow}>
             <Text style={styles.eyebrow}>Novedad</Text>

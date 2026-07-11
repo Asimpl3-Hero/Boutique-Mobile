@@ -11,10 +11,25 @@ export const styles = StyleSheet.create({
   scroll: {
     marginTop: -WAVE_HEIGHT,
   },
-  image: {
+  // The wrapper owns the size so the absolute wave can overlay the photo.
+  imageWrap: {
     width: '100%',
     aspectRatio: 0.95,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
     backgroundColor: colors.muted,
+  },
+  // Background-colored wave rising over the photo's bottom edge,
+  // mirrored so its curve reads opposite to the header's.
+  imageWave: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -StyleSheet.hairlineWidth,
+    height: WAVE_HEIGHT,
+    transform: [{ scaleX: -1 }],
   },
   content: {
     paddingHorizontal: spacing.container,
