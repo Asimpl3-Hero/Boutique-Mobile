@@ -5,6 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '@theme';
 import { styles } from './FloatingTabBar.styles';
 
+// Metric other screens need to pad scroll content above the floating bar.
+export { BAR_HEIGHT } from './FloatingTabBar.styles';
+
 export interface FloatingTabBarProps extends BottomTabBarProps {
   /** Name of the route rendered as the prominent circular action button. */
   actionRoute?: string;
