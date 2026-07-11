@@ -4,6 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Header, BAR_HEIGHT, WAVE_HEIGHT } from '@components/layout';
 import { Button, HangerIcon, ShirtIcon } from '@components/ui';
 import {
+  CartFab,
   CategoryCard,
   HeroBanner,
   ProductCarousel,
@@ -192,7 +193,7 @@ export const HomeScreen = () => {
             <HeroBanner />
             <View style={styles.sectionRow}>
               <View style={styles.sectionTitleWrapper}>
-                <Text style={styles.sectionTitle}>Moda Borcelle</Text>
+                <Text style={styles.sectionTitle}>Moda</Text>
               </View>
             </View>
             {products.length > 0 ? (
@@ -212,6 +213,13 @@ export const HomeScreen = () => {
             </View>
           </View>
         }
+      />
+      <CartFab
+        onPress={() => {
+          if (navigationRef.isReady()) {
+            navigationRef.navigate('Cart');
+          }
+        }}
       />
     </SafeAreaView>
   );

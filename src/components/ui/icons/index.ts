@@ -3,6 +3,8 @@ export * from './SearchIcon';
 export * from './ReceiptIcon';
 export * from './MenuIcon';
 export * from './BellIcon';
+export * from './BagIcon';
+export * from './CartIcon';
 export * from './HeartIcon';
 export * from './PlusIcon';
 export * from './ChevronLeftIcon';

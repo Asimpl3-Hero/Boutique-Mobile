@@ -5,3 +5,4 @@ export * from './ProductCard';
 export * from './ProductCarousel';
 export * from './CategoryCard';
 export * from './SearchOverlay';
+export * from './CartFab';

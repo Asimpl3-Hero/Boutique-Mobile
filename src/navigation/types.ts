@@ -7,6 +7,7 @@ export type RootStackParamList = {
   Splash: undefined;
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
   ProductDetail: { productId: string };
+  Cart: undefined;
 };
 
 /** Bottom-tab routes. Cart is a FAB (mobile-05), not a tab; no auth/profile. */
