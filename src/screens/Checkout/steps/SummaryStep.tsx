@@ -1,9 +1,10 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { formatPrice } from '@lib';
+import { formatPrice, taxFromBase } from '@lib';
 import type { CartItem } from '@store';
 import type { ShippingFormValues } from './ShippingStep';
 import type { TokenizedCardSummary } from './CardStep';
+import { bagTaxRate } from './BagStep';
 import { styles } from '../Checkout.styles';
 
 export interface SummaryStepProps {
@@ -21,7 +22,12 @@ export const SummaryStep = ({
   customerEmail,
   shipping,
   card,
-}: SummaryStepProps) => (
+}: SummaryStepProps) => {
+  const taxRate = bagTaxRate(items);
+  // Prices are the base: VAT is added on top of the charged total.
+  const taxInCents = taxFromBase(totalInCents, taxRate);
+
+  return (
   <View style={styles.formGap}>
     <Text style={styles.stepTitle}>Resumen</Text>
 
@@ -43,9 +49,29 @@ export const SummaryStep = ({
         <Text style={styles.summaryLabel}>Envío y tarifas</Text>
         <Text style={styles.summaryValue}>Se confirman al procesar</Text>
       </View>
+      {taxRate > 0 ? (
+        <>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Precio sin IVA</Text>
+            <Text style={styles.summaryValue}>
+              {formatPrice(totalInCents)}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>
+              {`IVA aplicado (${taxRate}%)`}
+            </Text>
+            <Text style={styles.summaryValue}>{formatPrice(taxInCents)}</Text>
+          </View>
+        </>
+      ) : null}
       <View style={styles.totalRow}>
-        <Text style={styles.totalLabel}>Total</Text>
-        <Text style={styles.totalValue}>{formatPrice(totalInCents)}</Text>
+        <Text style={styles.totalLabel}>
+          {taxRate > 0 ? 'Total con IVA' : 'Total'}
+        </Text>
+        <Text style={styles.totalValue}>
+          {formatPrice(totalInCents + taxInCents)}
+        </Text>
       </View>
     </View>
 
@@ -55,11 +81,47 @@ export const SummaryStep = ({
         <Text style={styles.summaryValue}>{customerEmail}</Text>
       </View>
       <View style={styles.summaryRow}>
-        <Text style={styles.summaryLabel}>Envía a</Text>
-        <Text style={styles.summaryValue} numberOfLines={2}>
-          {`${shipping.fullName} — ${shipping.address1}, ${shipping.city}`}
+        <Text style={styles.summaryLabel}>Recibe</Text>
+        <Text style={styles.summaryValue} numberOfLines={1}>
+          {shipping.fullName}
         </Text>
       </View>
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Email de envío</Text>
+        <Text style={styles.summaryValue} numberOfLines={1}>
+          {shipping.email}
+        </Text>
+      </View>
+      {shipping.phone.trim() ? (
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Teléfono</Text>
+          <Text style={styles.summaryValue}>{shipping.phone}</Text>
+        </View>
+      ) : null}
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Dirección</Text>
+        <Text style={styles.summaryValue} numberOfLines={2}>
+          {shipping.address2.trim()
+            ? `${shipping.address1}, ${shipping.address2}`
+            : shipping.address1}
+        </Text>
+      </View>
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Ciudad</Text>
+        <Text style={styles.summaryValue} numberOfLines={1}>
+          {`${shipping.city}, ${shipping.state}`}
+        </Text>
+      </View>
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Código postal</Text>
+        <Text style={styles.summaryValue}>{shipping.zip}</Text>
+      </View>
+      {shipping.country.trim() ? (
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>País</Text>
+          <Text style={styles.summaryValue}>{shipping.country}</Text>
+        </View>
+      ) : null}
       <View style={styles.summaryRow}>
         <Text style={styles.summaryLabel}>Pago</Text>
         <Text style={styles.summaryValue}>
@@ -68,4 +130,5 @@ export const SummaryStep = ({
       </View>
     </View>
   </View>
-);
+  );
+};

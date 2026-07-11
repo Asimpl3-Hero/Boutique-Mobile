@@ -11,5 +11,7 @@ export const mapApiProduct = (api: ApiProduct): Product => ({
   imageUrl: api.imageUrl,
   stock: api.stock,
   currency: api.currency,
+  // Tolerates an older backend without the field (renders as 0%).
+  taxRatePercent: api.taxRatePercent ?? 0,
   createdAt: api.createdAt,
 });

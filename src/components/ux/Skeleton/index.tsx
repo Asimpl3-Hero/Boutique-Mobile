@@ -1,38 +1,42 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleProp, ViewStyle } from 'react-native';
+import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
+import { colors } from '@theme';
 import { styles } from './Skeleton.styles';
 
 export interface SkeletonProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Pulsing placeholder block shown while content loads. */
+/** One-way blend duration; the loop ping-pongs back for a soft drift. */
+const BLEND_DURATION_MS = 1200;
+
+/** Placeholder block that softly drifts between the two brand colors. */
 export const Skeleton = ({ style }: SkeletonProps) => {
-  const opacity = useRef(new Animated.Value(0.45)).current;
+  const blend = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0.45,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, [opacity]);
+    const timing = (toValue: number) =>
+      Animated.timing(blend, {
+        toValue,
+        duration: BLEND_DURATION_MS,
+        easing: Easing.inOut(Easing.ease),
+        // Color interpolation cannot run on the native driver.
+        useNativeDriver: false,
+      });
+    const drift = Animated.loop(Animated.sequence([timing(1), timing(0)]));
+    drift.start();
+    return () => drift.stop();
+  }, [blend]);
+
+  const backgroundColor = blend.interpolate({
+    inputRange: [0, 1],
+    outputRange: [colors.primary, colors.secondary],
+  });
 
   return (
     <Animated.View
       accessibilityLabel="Loading"
-      style={[styles.base, { opacity }, style]}
+      style={[styles.base, { backgroundColor }, style]}
     />
   );
 };

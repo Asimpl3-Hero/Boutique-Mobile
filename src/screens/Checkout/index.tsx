@@ -150,7 +150,10 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
       const transaction: StoredTransaction = {
         orderIds: result.orderIds,
         status: result.finalStatus,
-        amountInCents: total,
+        // Charged total (base + VAT) as the backend persisted it.
+        amountInCents: result.amountInCents,
+        taxInCents: result.taxInCents,
+        taxRatePercent: result.taxRatePercent,
         cardLastFour: card.lastFour,
         createdAt: new Date().toISOString(),
         items: itemsSnapshot,

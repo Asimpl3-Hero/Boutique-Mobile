@@ -26,6 +26,12 @@ jest.mock('react-native-keychain', () => {
   };
 });
 
+// Native video player isn't available under Jest — render a plain View.
+jest.mock('react-native-video', () => {
+  const { View } = require('react-native');
+  return { __esModule: true, default: View };
+});
+
 // Native env module isn't available under Jest — provide the test values.
 jest.mock('react-native-config', () => ({
   API_URL: 'http://localhost:3000',

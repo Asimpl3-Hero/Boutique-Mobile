@@ -7,6 +7,8 @@ export interface ApiProduct {
   imageUrl: string;
   stock: number;
   currency: string;
+  /** VAT rate already included in priceInCents (integer percent). */
+  taxRatePercent: number;
   createdAt: string;
 }
 
@@ -21,5 +23,7 @@ export interface Product {
   imageUrl: string;
   stock: number;
   currency: string;
+  /** VAT rate already included in the price (integer percent). */
+  taxRatePercent: number;
   createdAt: string;
 }

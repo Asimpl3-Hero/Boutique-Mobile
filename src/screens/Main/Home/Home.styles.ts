@@ -49,6 +49,15 @@ export const styles = StyleSheet.create({
   skeletonRow: {
     flexDirection: 'row',
   },
+  // Carousel placeholder: flush square tiles like the real strip.
+  carouselSkeletonRow: {
+    flexDirection: 'row',
+  },
+  carouselSkeletonTile: {
+    flex: 1,
+    aspectRatio: 0.8,
+    borderRadius: 0,
+  },
   skeletonCard: {
     flex: 1,
     height: moderateScale(240),
@@ -72,5 +81,19 @@ export const styles = StyleSheet.create({
     ...typography.bodySm,
     color: colors.textMuted,
     textAlign: 'center',
+  },
+  // Closing brand mark under the video strip.
+  brandFooter: {
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.lg,
+  },
+  brandFooterLogo: {
+    width: moderateScale(36),
+    height: moderateScale(36),
+  },
+  brandFooterVersion: {
+    ...typography.caption,
+    color: colors.textMuted,
   },
 });

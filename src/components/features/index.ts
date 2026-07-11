@@ -7,3 +7,5 @@ export * from './CategoryCard';
 export * from './SearchOverlay';
 export * from './CartFab';
 export * from './CartModal';
+export * from './VideoBanner';
+export * from './SubscribeBanner';

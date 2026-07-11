@@ -18,6 +18,7 @@ const product = (id: string, priceInCents: number): Product => ({
   imageUrl: `https://cdn.example.com/${id}.jpg`,
   stock: 10,
   currency: 'COP',
+  taxRatePercent: 18,
   createdAt: '2026-07-01T00:00:00.000Z',
 });
 

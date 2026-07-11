@@ -23,6 +23,7 @@ const apiProduct: ApiProduct = {
   imageUrl: 'https://cdn.example.com/p-1.jpg',
   stock: 5,
   currency: 'COP',
+  taxRatePercent: 18,
   createdAt: '2026-07-01T00:00:00.000Z',
 };
 

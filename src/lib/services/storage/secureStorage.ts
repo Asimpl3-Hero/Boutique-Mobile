@@ -26,6 +26,10 @@ export interface StoredTransaction {
   orderIds: string[];
   status: 'APPROVED' | 'DECLINED';
   amountInCents: number;
+  /** VAT included in amountInCents (optional: older records predate it). */
+  taxInCents?: number;
+  /** VAT rate frozen by the backend at purchase time (integer percent). */
+  taxRatePercent?: number;
   cardLastFour: string;
   createdAt: string;
   items: StoredTransactionItem[];

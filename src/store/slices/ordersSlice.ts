@@ -75,6 +75,12 @@ export interface SubmitOrdersArgs {
 export interface SubmitOrdersResult {
   finalStatus: Extract<OrderStatus, 'APPROVED' | 'DECLINED'>;
   orderIds: string[];
+  /** Backend-authoritative charged total (base + VAT) across the orders. */
+  amountInCents: number;
+  /** Backend-authoritative VAT summed across the run's orders. */
+  taxInCents: number;
+  /** Rate frozen on the created orders (integer percent). */
+  taxRatePercent: number;
 }
 
 /**
@@ -91,6 +97,9 @@ export const submitOrders = createAsyncThunk(
     maxAttempts = 30,
   }: SubmitOrdersArgs): Promise<SubmitOrdersResult> => {
     const orderIds: string[] = [];
+    let amountInCents = 0;
+    let taxInCents = 0;
+    let taxRatePercent = 0;
 
     for (const request of requests) {
       const created = await ordersService.createOrder(request);
@@ -98,10 +107,11 @@ export const submitOrders = createAsyncThunk(
 
       let status: OrderStatus = created.status;
       let attempt = 0;
+      let lastOrder = null;
       while (status === 'PENDING' && attempt < maxAttempts) {
         await sleep(intervalMs);
-        const order = await ordersService.getOrder(created.orderId);
-        status = order.status;
+        lastOrder = await ordersService.getOrder(created.orderId);
+        status = lastOrder.status;
         attempt += 1;
       }
 
@@ -110,12 +120,32 @@ export const submitOrders = createAsyncThunk(
           'El pago sigue pendiente. Intenta de nuevo en un momento.',
         );
       }
+      // Terminal at creation: fetch once for the persisted breakdown.
+      if (!lastOrder) {
+        lastOrder = await ordersService.getOrder(created.orderId);
+      }
+      amountInCents += lastOrder.amountInCents ?? 0;
+      taxInCents += lastOrder.taxInCents ?? 0;
+      taxRatePercent = lastOrder.taxRatePercent ?? taxRatePercent;
+
       if (status === 'DECLINED') {
-        return { finalStatus: 'DECLINED', orderIds };
+        return {
+          finalStatus: 'DECLINED',
+          orderIds,
+          amountInCents,
+          taxInCents,
+          taxRatePercent,
+        };
       }
     }
 
-    return { finalStatus: 'APPROVED', orderIds };
+    return {
+      finalStatus: 'APPROVED',
+      orderIds,
+      amountInCents,
+      taxInCents,
+      taxRatePercent,
+    };
   },
 );
 

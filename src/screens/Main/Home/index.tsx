@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Image, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header, BAR_HEIGHT } from '@components/layout';
 import { Button, HangerIcon, ShirtIcon } from '@components/ui';
@@ -7,6 +7,8 @@ import {
   CategoryCard,
   HeroBanner,
   ProductCarousel,
+  SubscribeBanner,
+  VideoBanner,
 } from '@components/features';
 import { Skeleton } from '@components/ux';
 import {
@@ -17,9 +19,12 @@ import {
   selectProductsError,
   selectProductsStatus,
 } from '@store';
+import { APP_VERSION } from '@lib';
 import { colors, moderateScale, spacing } from '@theme';
 import { navigationRef } from '@/navigation';
 import { styles } from './Home.styles';
+
+const APP_LOGO = require('@/assets/images/logos/app-icon.png');
 
 interface MosaicItem {
   title: string;
@@ -203,6 +208,26 @@ export const HomeScreen = () => {
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={listEmpty}
+        // Flush under the last category row: the list has no vertical gaps.
+        ListFooterComponent={
+          status === 'succeeded' ? (
+            <>
+              <SubscribeBanner />
+              <VideoBanner />
+              <View style={styles.brandFooter}>
+                <Image
+                  source={APP_LOGO}
+                  style={styles.brandFooterLogo}
+                  resizeMode="contain"
+                  accessibilityLabel="Borcelle"
+                />
+                <Text style={styles.brandFooterVersion}>
+                  {`v${APP_VERSION}`}
+                </Text>
+              </View>
+            </>
+          ) : null
+        }
         ListHeaderComponent={
           <View style={styles.listHeader}>
             <HeroBanner />
@@ -226,6 +251,13 @@ export const HomeScreen = () => {
                   }
                 }}
               />
+            ) : status === 'loading' || status === 'idle' ? (
+              // Mirrors the strip: three flush tiles, same aspect ratio.
+              <View style={styles.carouselSkeletonRow}>
+                <Skeleton style={styles.carouselSkeletonTile} />
+                <Skeleton style={styles.carouselSkeletonTile} />
+                <Skeleton style={styles.carouselSkeletonTile} />
+              </View>
             ) : null}
             <View style={styles.sectionRow}>
               <View style={styles.sectionTitleWrapper}>

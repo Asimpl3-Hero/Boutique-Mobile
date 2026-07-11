@@ -111,7 +111,22 @@ describe('ordersSlice', () => {
     mockedCreate
       .mockResolvedValueOnce({ orderId: 'o-1', checkoutUrl: null, status: 'PENDING' })
       .mockResolvedValueOnce({ orderId: 'o-2', checkoutUrl: null, status: 'APPROVED' });
-    mockedGet.mockResolvedValueOnce({ id: 'o-1', status: 'APPROVED' });
+    mockedGet
+      .mockResolvedValueOnce({
+        id: 'o-1',
+        status: 'APPROVED',
+        taxRatePercent: 18,
+        taxInCents: 1800,
+        amountInCents: 11800,
+      })
+      // o-2 is terminal at creation: fetched once for its breakdown.
+      .mockResolvedValueOnce({
+        id: 'o-2',
+        status: 'APPROVED',
+        taxRatePercent: 18,
+        taxInCents: 1500,
+        amountInCents: 9800,
+      });
     const store = makeStore();
 
     const result = await store
@@ -123,6 +138,9 @@ describe('ordersSlice', () => {
     expect(result).toEqual({
       finalStatus: 'APPROVED',
       orderIds: ['o-1', 'o-2'],
+      amountInCents: 21600,
+      taxRatePercent: 18,
+      taxInCents: 3300,
     });
     expect(mockedCreate).toHaveBeenCalledTimes(2);
     expect(selectOrderFlowStatus(store.getState())).toBe('approved');

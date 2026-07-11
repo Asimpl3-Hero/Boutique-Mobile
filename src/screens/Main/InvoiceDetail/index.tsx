@@ -53,6 +53,9 @@ export const InvoiceDetailScreen = ({
   const { transaction } = route.params;
   const approved = transaction.status === 'APPROVED';
   const shipping = transaction.shipping;
+  // Backend-authoritative breakdown; older records predate the fields.
+  const taxInCents = transaction.taxInCents;
+  const hasTax = typeof taxInCents === 'number' && taxInCents > 0;
 
   // Soft random color drift behind the receipt.
   const blend = useRef(new Animated.Value(0)).current;
@@ -103,7 +106,7 @@ export const InvoiceDetailScreen = ({
               accessibilityLabel="Borcelle"
             />
             <View style={styles.titleRow}>
-              <Text style={styles.titleText}>FACTURA</Text>
+              <Text style={styles.titleText}>FACTURA BORCELLE</Text>
               <Text style={styles.number}>{invoiceNumber(transaction)}</Text>
             </View>
             <Text style={styles.date}>
@@ -181,8 +184,30 @@ export const InvoiceDetailScreen = ({
                   </Text>
                 </View>
               ))}
+              {hasTax ? (
+                <>
+                  <View style={styles.row}>
+                    <Text style={[styles.cellText, styles.cellProduct]}>
+                      Precio sin IVA
+                    </Text>
+                    <Text style={[styles.cellText, styles.cellPrice]}>
+                      {formatPrice(transaction.amountInCents - taxInCents)}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={[styles.cellText, styles.cellProduct]}>
+                      {`IVA aplicado (${transaction.taxRatePercent ?? 0}%)`}
+                    </Text>
+                    <Text style={[styles.cellText, styles.cellPrice]}>
+                      {formatPrice(taxInCents)}
+                    </Text>
+                  </View>
+                </>
+              ) : null}
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalLabel}>
+                  {hasTax ? 'Total con IVA' : 'Total'}
+                </Text>
                 <Text style={styles.totalValue}>
                   {formatPrice(transaction.amountInCents)}
                 </Text>
