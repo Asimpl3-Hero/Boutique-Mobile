@@ -30,9 +30,14 @@ export interface TokenizedCardSummary {
 }
 
 export interface CardStepProps {
-  card: TokenizedCardSummary | null;
+  /** Saved cards (capped at MAX_CARDS); the selected one pays. */
+  cards: TokenizedCardSummary[];
+  selectedIndex: number;
+  onSelect: (index: number) => void;
   onTokenized: (card: TokenizedCardSummary) => void;
 }
+
+export const MAX_CARDS = 2;
 
 const BRAND_LABEL: Record<CardBrand, string> = {
   visa: 'VISA',
@@ -40,8 +45,19 @@ const BRAND_LABEL: Record<CardBrand, string> = {
   unknown: 'TARJETA',
 };
 
+/** Sandbox test cards from the payments provider (approve / decline). */
+const TEST_CARDS = {
+  approved: '4242 4242 4242 4242',
+  declined: '4111 1111 1111 1111',
+} as const;
+
 /** Step 3 — card capture in a bottom backdrop; only the token leaves. */
-export const CardStep = ({ card, onTokenized }: CardStepProps) => {
+export const CardStep = ({
+  cards,
+  selectedIndex,
+  onSelect,
+  onTokenized,
+}: CardStepProps) => {
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const [number, setNumber] = useState('');
@@ -62,6 +78,15 @@ export const CardStep = ({ card, onTokenized }: CardStepProps) => {
     setHolder('');
     setExpiry('');
     setCvc('');
+  };
+
+  const fillTestCard = (number16: string, holder16: string) => {
+    setNumber(number16);
+    setHolder(holder16);
+    setExpiry('12/29');
+    setCvc('123');
+    setErrors({});
+    setSubmitError(null);
   };
 
   const save = async () => {
@@ -114,28 +139,46 @@ export const CardStep = ({ card, onTokenized }: CardStepProps) => {
   return (
     <View style={styles.formGap}>
       <Text style={styles.stepTitle}>Pago con tarjeta</Text>
-      {card ? (
-        <View style={styles.cardSummary}>
-          <Text style={styles.cardSummaryText}>
-            {`•••• ${card.lastFour}`}
-          </Text>
-          <View style={styles.brandBadge}>
-            <Text style={styles.brandBadgeText}>
-              {BRAND_LABEL[card.brand]}
-            </Text>
-          </View>
-        </View>
-      ) : (
+      {cards.length === 0 ? (
         <Text style={styles.caption}>
           Agrega una tarjeta para continuar. Solo guardamos el token — nunca
           el número.
         </Text>
+      ) : (
+        cards.map((card, index) => (
+          <Pressable
+            key={`${card.cardToken}-${index}`}
+            accessibilityRole="button"
+            accessibilityLabel={`Tarjeta terminada en ${card.lastFour}`}
+            accessibilityState={
+              index === selectedIndex ? { selected: true } : {}
+            }
+            onPress={() => onSelect(index)}
+            style={[
+              styles.cardSummary,
+              index === selectedIndex && styles.cardSummarySelected,
+            ]}
+          >
+            <Text style={styles.cardSummaryText}>
+              {`•••• ${card.lastFour}`}
+            </Text>
+            <View style={styles.brandBadge}>
+              <Text style={styles.brandBadgeText}>
+                {BRAND_LABEL[card.brand]}
+              </Text>
+            </View>
+          </Pressable>
+        ))
       )}
-      <Button
-        label={card ? 'Cambiar tarjeta' : 'Pagar con tarjeta'}
-        variant={card ? 'ghost' : 'primary'}
-        onPress={() => setOpen(true)}
-      />
+      {cards.length < MAX_CARDS ? (
+        <Button
+          label={cards.length > 0 ? 'Agregar otra tarjeta' : 'Pagar con tarjeta'}
+          variant={cards.length > 0 ? 'ghost' : 'primary'}
+          onPress={() => setOpen(true)}
+        />
+      ) : (
+        <Text style={styles.caption}>Máximo 2 tarjetas guardadas.</Text>
+      )}
 
       <Modal
         visible={open}
@@ -163,6 +206,26 @@ export const CardStep = ({ card, onTokenized }: CardStepProps) => {
               <Text style={styles.backdropTitle}>Datos de tarjeta</Text>
               <View style={styles.brandBadge}>
                 <Text style={styles.brandBadgeText}>{BRAND_LABEL[brand]}</Text>
+              </View>
+            </View>
+            <View style={styles.fieldRow}>
+              <View style={styles.fieldFlex}>
+                <Button
+                  label="Prueba aprobada"
+                  variant="ghost"
+                  onPress={() =>
+                    fillTestCard(TEST_CARDS.approved, 'APPROVED TEST')
+                  }
+                />
+              </View>
+              <View style={styles.fieldFlex}>
+                <Button
+                  label="Prueba rechazada"
+                  variant="ghost"
+                  onPress={() =>
+                    fillTestCard(TEST_CARDS.declined, 'DECLINED TEST')
+                  }
+                />
               </View>
             </View>
             <TextInputField

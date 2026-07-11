@@ -106,7 +106,9 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
   const [customerEmail, setCustomerEmail] = useState('');
   const [shipping, setShipping] = useState<ShippingFormValues>(EMPTY_SHIPPING);
   const [errors, setErrors] = useState<ShippingErrors>({});
-  const [card, setCard] = useState<TokenizedCardSummary | null>(null);
+  const [cards, setCards] = useState<TokenizedCardSummary[]>([]);
+  const [selectedCard, setSelectedCard] = useState(0);
+  const card = cards[selectedCard] ?? null;
   const flowStatus = useAppSelector(selectOrderFlowStatus);
   const flowError = useAppSelector(selectOrderError);
 
@@ -154,6 +156,22 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
     dispatch(resetOrderFlow());
     // Back to Home (step 7 of the flow).
     navigation.goBack();
+  };
+
+  const autofillShipping = () => {
+    setCustomerEmail('cliente@correo.com');
+    setShipping({
+      fullName: 'Ana Pérez',
+      email: 'ana.perez@correo.com',
+      phone: '3001234567',
+      address1: 'Calle 12 # 34-56',
+      address2: 'Apto 501',
+      city: 'Bogotá',
+      state: 'Cundinamarca',
+      zip: '110111',
+      country: 'CO',
+    });
+    setErrors({});
   };
 
   const goBack = () => {
@@ -211,9 +229,23 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
               setShipping(current => ({ ...current, [field]: value }))
             }
             errors={errors}
+            onAutofill={autofillShipping}
           />
         ) : null}
-        {step === 2 ? <CardStep card={card} onTokenized={setCard} /> : null}
+        {step === 2 ? (
+          <CardStep
+            cards={cards}
+            selectedIndex={selectedCard}
+            onSelect={setSelectedCard}
+            onTokenized={tokenized => {
+              setCards(current => {
+                const next = [...current, tokenized].slice(0, 2);
+                setSelectedCard(next.length - 1);
+                return next;
+              });
+            }}
+          />
+        ) : null}
         {step === 3 ? (
           <SummaryStep
             items={items}
@@ -274,8 +306,14 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
               ? 'Tu banco rechazó la transacción. Intenta con otra tarjeta.'
               : flowStatus === 'error'
                 ? flowError ?? undefined
-                : 'No cierres la app.'
+                : undefined
         }
+        loadingSteps={[
+          { progress: 0.2, text: 'Creando tu orden…' },
+          { progress: 0.45, text: 'Enviando el pago…' },
+          { progress: 0.7, text: 'Confirmando con tu banco…' },
+          { progress: 0.9, text: 'Casi listo, no cierres la app…' },
+        ]}
         onRetry={flowStatus === 'error' ? handlePay : undefined}
         onDone={closeStatus}
       />

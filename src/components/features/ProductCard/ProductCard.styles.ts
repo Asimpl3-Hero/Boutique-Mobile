@@ -13,6 +13,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  // Opt-in rounding for category grids (flush strips stay square).
+  containerRounded: {
+    borderRadius: radius.card,
+    overflow: 'hidden',
+  },
   imageWrapper: {
     overflow: 'hidden',
     backgroundColor: colors.muted,

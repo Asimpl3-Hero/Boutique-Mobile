@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Header, BAR_HEIGHT, WAVE_HEIGHT } from '@components/layout';
+import { Header, BAR_HEIGHT } from '@components/layout';
 import { Button, HangerIcon, ShirtIcon } from '@components/ui';
 import {
   CategoryCard,
@@ -126,6 +126,22 @@ export const HomeScreen = () => {
                 ) : undefined
               }
               variant={item.items.length === 1 ? 'wide' : 'half'}
+              onPress={() => {
+                if (navigationRef.isReady()) {
+                  navigationRef.navigate('Main', {
+                    screen: 'Home',
+                    params: {
+                      screen: 'Category',
+                      params: {
+                        title: category.title,
+                        image: category.image,
+                        backgroundColor: category.backgroundColor,
+                        underlineColor: category.underlineColor,
+                      },
+                    },
+                  });
+                }
+              }}
             />
           </View>
         ))}

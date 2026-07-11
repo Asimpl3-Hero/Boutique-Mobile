@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import {
   Button,
@@ -13,12 +13,20 @@ import { styles } from './StatusScreen.styles';
 
 export type StatusState = 'loading' | 'success' | 'error';
 
+export interface LoadingStep {
+  /** Bar fill for this stage (0–1). */
+  progress: number;
+  text: string;
+}
+
 export interface StatusScreenProps {
   visible: boolean;
   state: StatusState;
   /** Defaults per state when omitted. */
   title?: string;
   message?: string;
+  /** Staged copy cycled while loading; overrides `message` in that state. */
+  loadingSteps?: LoadingStep[];
   /** Error only: offers a retry action. */
   onRetry?: () => void;
   /** Terminal states: close/continue action. */
@@ -39,6 +47,15 @@ const DEFAULT_TITLE: Record<StatusState, string> = {
 
 const ICON_SIZE = moderateScale(72);
 
+const DEFAULT_LOADING_STEPS: LoadingStep[] = [
+  { progress: 0.25, text: 'Preparando todo…' },
+  { progress: 0.55, text: 'Procesando…' },
+  { progress: 0.85, text: 'Casi listo…' },
+];
+
+/** Cadence for advancing through the loading copy. */
+const STEP_INTERVAL_MS = 2200;
+
 /** Full-screen status: circular reveal in the state color, SVG feedback
  *  icon, minimalist progress bar and optional actions. Presentational —
  *  the caller decides the state (e.g. checkout maps payment results). */
@@ -47,9 +64,29 @@ export const StatusScreen = ({
   state,
   title,
   message,
+  loadingSteps = DEFAULT_LOADING_STEPS,
   onRetry,
   onDone,
-}: StatusScreenProps) => (
+}: StatusScreenProps) => {
+  const [stage, setStage] = useState(0);
+
+  // Walk the staged copy while loading; reset for the next run.
+  useEffect(() => {
+    if (!visible || state !== 'loading') {
+      setStage(0);
+      return;
+    }
+    const timer = setInterval(
+      () => setStage(current => Math.min(current + 1, loadingSteps.length - 1)),
+      STEP_INTERVAL_MS,
+    );
+    return () => clearInterval(timer);
+  }, [visible, state, loadingSteps.length]);
+
+  const loadingStep = loadingSteps[Math.min(stage, loadingSteps.length - 1)];
+  const shownMessage = state === 'loading' ? loadingStep?.text : message;
+
+  return (
   <Modal visible={visible} animationType="fade" onRequestClose={() => {}}>
     <View style={styles.container}>
       <CircularReveal color={STATE_COLOR[state]} active durationMs={550} />
@@ -62,10 +99,12 @@ export const StatusScreen = ({
           <DeniedIcon size={ICON_SIZE} color={colors.onError} />
         )}
         <Text style={styles.title}>{title ?? DEFAULT_TITLE[state]}</Text>
-        {message ? <Text style={styles.message}>{message}</Text> : null}
+        {shownMessage ? (
+          <Text style={styles.message}>{shownMessage}</Text>
+        ) : null}
         <View style={styles.barWrapper}>
           <ProgressBar
-            progress={state === 'loading' ? undefined : 1}
+            progress={state === 'loading' ? loadingStep?.progress ?? 0.2 : 1}
             color={colors.surface}
           />
         </View>
@@ -92,4 +131,5 @@ export const StatusScreen = ({
       </View>
     </View>
   </Modal>
-);
+  );
+};

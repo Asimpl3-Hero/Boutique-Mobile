@@ -2,3 +2,4 @@
 export * from './Main';
 export * from './Splash';
 export * from './Checkout';
+export * from './Dev/StatusDemo';

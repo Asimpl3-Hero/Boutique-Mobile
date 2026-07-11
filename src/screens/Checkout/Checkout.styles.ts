@@ -118,6 +118,10 @@ export const styles = StyleSheet.create({
     borderWidth: moderateScale(1.5),
     borderColor: colors.border,
   },
+  cardSummarySelected: {
+    borderColor: colors.primary,
+    borderWidth: moderateScale(2),
+  },
   cardSummaryText: {
     ...typography.body,
     color: colors.text,

@@ -43,7 +43,12 @@ export const ProgressBar = ({ progress, color }: ProgressBarProps) => {
     <View
       accessibilityRole="progressbar"
       style={styles.track}
-      onLayout={event => setTrackWidth(event.nativeEvent.layout.width)}
+      onLayout={event => {
+        // Restart the sweep from the left once the track is measured,
+        // so the segment never appears mid-run near the end.
+        sweep.setValue(0);
+        setTrackWidth(event.nativeEvent.layout.width);
+      }}
     >
       {indeterminate ? (
         <Animated.View

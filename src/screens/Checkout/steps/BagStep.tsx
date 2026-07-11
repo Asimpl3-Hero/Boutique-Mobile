@@ -81,7 +81,8 @@ export const BagStep = ({
           <Text style={styles.totalValue}>{formatPrice(totalInCents)}</Text>
         </View>
         <Text style={styles.caption}>
-          Cada producto se procesa como una orden independiente.
+          Tu privacidad es lo primero: tus datos personales y de pago se
+          procesan de forma segura y cifrada.
         </Text>
       </>
     )}

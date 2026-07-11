@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { TextInputField } from '@components/ui';
+import { Button, TextInputField } from '@components/ui';
 import { styles } from '../Checkout.styles';
 
 /** Editable shipping form values (mirrors ShippingData, all as strings). */
@@ -26,6 +26,8 @@ export interface ShippingStepProps {
   values: ShippingFormValues;
   onChange: (field: keyof ShippingFormValues, value: string) => void;
   errors: ShippingErrors;
+  /** Fills the form with sample data (testing convenience). */
+  onAutofill?: () => void;
 }
 
 /** Step 2 — customer email + shipping data, aligned with the backend DTO. */
@@ -35,6 +37,7 @@ export const ShippingStep = ({
   values,
   onChange,
   errors,
+  onAutofill,
 }: ShippingStepProps) => (
   <View style={styles.formGap}>
     <Text style={styles.stepTitle}>Envío</Text>
@@ -116,5 +119,12 @@ export const ShippingStep = ({
         />
       </View>
     </View>
+    {onAutofill ? (
+      <Button
+        label="Autorellenar datos de prueba"
+        variant="ghost"
+        onPress={onAutofill}
+      />
+    ) : null}
   </View>
 );

@@ -8,12 +8,22 @@ export type RootStackParamList = {
   Splash: undefined;
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
   Cart: undefined;
+  /** Dev-only route (registered under __DEV__): loader states showcase. */
+  StatusDemo: undefined;
 };
 
 /** Stack nested in the Home tab so detail keeps the tab bar and FAB. */
 export type HomeStackParamList = {
   HomeMain: undefined;
   ProductDetail: { productId: string };
+  Category: {
+    title: string;
+    /** Bundled image module id for the banner (photo tiles). */
+    image?: number;
+    /** Solid banner fallback when there is no photo. */
+    backgroundColor?: string;
+    underlineColor?: string;
+  };
 };
 
 /** Bottom-tab routes. Cart is a FAB, not a tab; no auth/profile. */

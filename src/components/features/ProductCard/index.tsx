@@ -13,6 +13,8 @@ export interface ProductCardProps {
   /** 'half' for paired columns, 'wide' for full-width rows, 'tile' for
    *  image-only strips (no info footer, add button over the image). */
   variant?: ProductCardVariant;
+  /** Rounded corners (category grids); flat by default for flush strips. */
+  rounded?: boolean;
   /** Fired when the card body is pressed (e.g. open the product detail). */
   onPress?: () => void;
 }
@@ -26,6 +28,7 @@ const ADDED_FEEDBACK_MS = 3000;
 export const ProductCard = ({
   product,
   variant = 'half',
+  rounded = false,
   onPress,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
@@ -84,7 +87,7 @@ export const ProductCard = ({
       accessibilityRole="button"
       accessibilityLabel={`Ver ${product.name}`}
       onPress={onPress}
-      style={styles.container}
+      style={[styles.container, rounded && styles.containerRounded]}
     >
       <View style={styles.imageWrapper}>
         <Image
