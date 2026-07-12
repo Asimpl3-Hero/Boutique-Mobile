@@ -67,4 +67,9 @@ export const styles = StyleSheet.create({
   addButtonSuccess: {
     backgroundColor: colors.success,
   },
+  // Sold out: inert control, visually muted.
+  addButtonDisabled: {
+    backgroundColor: colors.textMuted,
+    opacity: 0.6,
+  },
 });

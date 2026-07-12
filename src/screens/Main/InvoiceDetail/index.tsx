@@ -10,7 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Header } from '@components/layout';
-import { formatPrice } from '@lib';
+import { PriceText } from '@components/ui';
+
 import { colors, moderateScale } from '@theme';
 import type { InvoicesStackScreenProps } from '@/navigation';
 import { formatInvoiceDate, invoiceNumber } from '../Invoices';
@@ -135,16 +136,46 @@ export const InvoiceDetailScreen = ({
                       {shipping.fullName}
                     </Text>
                   </View>
+                  {shipping.email ? (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Email</Text>
+                      <Text style={styles.infoValue} numberOfLines={1}>
+                        {shipping.email}
+                      </Text>
+                    </View>
+                  ) : null}
+                  {shipping.phone ? (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Teléfono</Text>
+                      <Text style={styles.infoValue} numberOfLines={1}>
+                        {shipping.phone}
+                      </Text>
+                    </View>
+                  ) : null}
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Dirección</Text>
                     <Text style={styles.infoValue} numberOfLines={2}>
-                      {`${
-                        shipping.address2
-                          ? `${shipping.address1}, ${shipping.address2}`
-                          : shipping.address1
-                      }\n${shipping.city}, ${shipping.state} · ${shipping.zip}`}
+                      {shipping.address2
+                        ? `${shipping.address1}, ${shipping.address2}`
+                        : shipping.address1}
                     </Text>
                   </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Ciudad</Text>
+                    <Text style={styles.infoValue} numberOfLines={1}>
+                      {`${shipping.city}, ${shipping.state}`}
+                    </Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Código postal</Text>
+                    <Text style={styles.infoValue}>{shipping.zip}</Text>
+                  </View>
+                  {shipping.country ? (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>País</Text>
+                      <Text style={styles.infoValue}>{shipping.country}</Text>
+                    </View>
+                  ) : null}
                 </>
               ) : null}
               <View style={styles.infoRow}>
@@ -176,12 +207,11 @@ export const InvoiceDetailScreen = ({
                   <Text style={[styles.cellText, styles.cellUnit]}>
                     {item.quantity}
                   </Text>
-                  <Text style={[styles.cellText, styles.cellPrice]}>
-                    {formatPrice(
-                      item.priceInCents * item.quantity,
-                      item.currency,
-                    )}
-                  </Text>
+                  <PriceText
+                    valueInCents={item.priceInCents * item.quantity}
+                    currency={item.currency}
+                    style={[styles.cellText, styles.cellPrice]}
+                  />
                 </View>
               ))}
               {hasTax ? (
@@ -190,27 +220,28 @@ export const InvoiceDetailScreen = ({
                     <Text style={[styles.cellText, styles.cellProduct]}>
                       Precio sin IVA
                     </Text>
-                    <Text style={[styles.cellText, styles.cellPrice]}>
-                      {formatPrice(transaction.amountInCents - taxInCents)}
-                    </Text>
+                    <PriceText
+                      valueInCents={transaction.amountInCents - taxInCents}
+                      style={[styles.cellText, styles.cellPrice]}
+                    />
                   </View>
                   <View style={styles.row}>
                     <Text style={[styles.cellText, styles.cellProduct]}>
                       {`IVA aplicado (${transaction.taxRatePercent ?? 0}%)`}
                     </Text>
-                    <Text style={[styles.cellText, styles.cellPrice]}>
-                      {formatPrice(taxInCents)}
-                    </Text>
+                    <PriceText
+                      valueInCents={taxInCents}
+                      style={[styles.cellText, styles.cellPrice]}
+                    />
                   </View>
                 </>
               ) : null}
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>
-                  {hasTax ? 'Total con IVA' : 'Total'}
-                </Text>
-                <Text style={styles.totalValue}>
-                  {formatPrice(transaction.amountInCents)}
-                </Text>
+                <Text style={styles.totalLabel}>Precio Total</Text>
+                <PriceText
+                  valueInCents={transaction.amountInCents}
+                  style={styles.totalValue}
+                />
               </View>
             </View>
 

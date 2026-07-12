@@ -11,11 +11,14 @@ export interface StoredTransactionItem {
 /** Shipping snapshot shown on the invoice (no sensitive data). */
 export interface StoredShipping {
   fullName: string;
+  email?: string;
+  phone?: string;
   address1: string;
   address2?: string;
   city: string;
   state: string;
   zip: string;
+  country?: string;
 }
 
 /**

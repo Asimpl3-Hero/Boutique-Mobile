@@ -3,9 +3,8 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { BAR_HEIGHT, Header } from '@components/layout';
-import { Button } from '@components/ui';
+import { Button, PriceText } from '@components/ui';
 import {
-  formatPrice,
   getTransactions,
   type StoredTransaction,
 } from '@lib';
@@ -81,9 +80,10 @@ export const InvoicesScreen = ({ navigation }: InvoicesProps) => {
               </Text>
             </View>
             <View style={styles.rowRight}>
-              <Text style={styles.rowTotal}>
-                {formatPrice(item.amountInCents)}
-              </Text>
+              <PriceText
+                valueInCents={item.amountInCents}
+                style={styles.rowTotal}
+              />
               <View
                 style={[
                   styles.statusChip,

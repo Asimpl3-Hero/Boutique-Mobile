@@ -6,3 +6,4 @@ export * from './PerkBadge';
 export * from './StatusScreen';
 export * from './CircularReveal';
 export * from './ProgressBar';
+export * from './SoldOutBadge';

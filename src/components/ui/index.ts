@@ -5,3 +5,4 @@ export * from './Button';
 export * from './Chip';
 export * from './SearchBar';
 export * from './TextInputField';
+export * from './PriceText';

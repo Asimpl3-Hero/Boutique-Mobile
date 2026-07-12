@@ -127,18 +127,19 @@ export const styles = StyleSheet.create({
   totalRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.md,
     paddingVertical: spacing.sm,
   },
-  // Oi runs wide: the label yields most of the row to the price.
+  // Both sides of the closing row speak Oi, sized down to fit together.
   totalLabel: {
-    flex: 1,
-    ...typography.bodySm,
-    fontFamily: typography.button.fontFamily,
+    ...typography.heading,
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
     color: colors.text,
   },
   // Total rendered in the Oi brand display face.
   totalValue: {
-    flex: 2,
+    flex: 1,
     ...typography.heading,
     fontSize: moderateScale(16),
     lineHeight: moderateScale(24),

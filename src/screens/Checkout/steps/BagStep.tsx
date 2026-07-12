@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { formatPrice, taxFromBase } from '@lib';
+import { PriceText } from '@components/ui';
+import { taxFromBase } from '@lib';
 import type { CartItem } from '@store';
 import { styles } from '../Checkout.styles';
 
@@ -50,12 +51,11 @@ export const BagStep = ({
               <Text style={styles.itemName} numberOfLines={1}>
                 {item.product.name}
               </Text>
-              <Text style={styles.itemPrice}>
-                {formatPrice(
-                  item.product.priceInCents * item.quantity,
-                  item.product.currency,
-                )}
-              </Text>
+              <PriceText
+                valueInCents={item.product.priceInCents * item.quantity}
+                currency={item.product.currency}
+                style={styles.itemPrice}
+              />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Eliminar ${item.product.name}`}
@@ -89,15 +89,17 @@ export const BagStep = ({
           <>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Subtotal</Text>
-              <Text style={styles.summaryValue}>
-                {formatPrice(totalInCents)}
-              </Text>
+              <PriceText
+                valueInCents={totalInCents}
+                style={styles.summaryValue}
+              />
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>{`IVA (${taxRate}%)`}</Text>
-              <Text style={styles.summaryValue}>
-                {formatPrice(taxInCents)}
-              </Text>
+              <PriceText
+                valueInCents={taxInCents}
+                style={styles.summaryValue}
+              />
             </View>
           </>
         ) : null}
@@ -105,9 +107,10 @@ export const BagStep = ({
           <Text style={styles.totalLabel}>
             {taxRate > 0 ? 'Total con IVA' : 'Total'}
           </Text>
-          <Text style={styles.totalValue}>
-            {formatPrice(totalInCents + taxInCents)}
-          </Text>
+          <PriceText
+            valueInCents={totalInCents + taxInCents}
+            style={styles.totalValue}
+          />
         </View>
         <Text style={styles.caption}>
           Tu privacidad es lo primero: tus datos personales y de pago se

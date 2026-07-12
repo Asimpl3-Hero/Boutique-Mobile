@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { formatPrice, taxFromBase } from '@lib';
+import { PriceText } from '@components/ui';
+import { taxFromBase } from '@lib';
 import type { CartItem } from '@store';
 import type { ShippingFormValues } from './ShippingStep';
 import type { TokenizedCardSummary } from './CardStep';
@@ -37,12 +38,11 @@ export const SummaryStep = ({
           <Text style={styles.summaryLabel} numberOfLines={1}>
             {`${item.product.name} ×${item.quantity}`}
           </Text>
-          <Text style={styles.summaryValue}>
-            {formatPrice(
-              item.product.priceInCents * item.quantity,
-              item.product.currency,
-            )}
-          </Text>
+          <PriceText
+            valueInCents={item.product.priceInCents * item.quantity}
+            currency={item.product.currency}
+            style={styles.summaryValue}
+          />
         </View>
       ))}
       <View style={styles.summaryRow}>
@@ -53,15 +53,16 @@ export const SummaryStep = ({
         <>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Precio sin IVA</Text>
-            <Text style={styles.summaryValue}>
-              {formatPrice(totalInCents)}
-            </Text>
+            <PriceText
+              valueInCents={totalInCents}
+              style={styles.summaryValue}
+            />
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>
               {`IVA aplicado (${taxRate}%)`}
             </Text>
-            <Text style={styles.summaryValue}>{formatPrice(taxInCents)}</Text>
+            <PriceText valueInCents={taxInCents} style={styles.summaryValue} />
           </View>
         </>
       ) : null}
@@ -69,9 +70,10 @@ export const SummaryStep = ({
         <Text style={styles.totalLabel}>
           {taxRate > 0 ? 'Total con IVA' : 'Total'}
         </Text>
-        <Text style={styles.totalValue}>
-          {formatPrice(totalInCents + taxInCents)}
-        </Text>
+        <PriceText
+          valueInCents={totalInCents + taxInCents}
+          style={styles.totalValue}
+        />
       </View>
     </View>
 

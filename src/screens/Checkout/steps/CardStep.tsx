@@ -148,8 +148,7 @@ export const CardStep = ({
       <Text style={styles.stepTitle}>Pago con tarjeta</Text>
       {cards.length === 0 ? (
         <Text style={styles.caption}>
-          Agrega una tarjeta para continuar. Solo guardamos el token — nunca
-          el número.
+          Agrega una tarjeta para continuar.
         </Text>
       ) : (
         cards.map((card, index) => (
@@ -241,7 +240,7 @@ export const CardStep = ({
             <View style={styles.fieldRow}>
               <View style={styles.fieldFlex}>
                 <Button
-                  label="Prueba aprobada"
+                  label="Tarjeta aprobada"
                   variant="ghost"
                   onPress={() =>
                     fillTestCard(TEST_CARDS.approved, 'APPROVED TEST')
@@ -250,7 +249,7 @@ export const CardStep = ({
               </View>
               <View style={styles.fieldFlex}>
                 <Button
-                  label="Prueba rechazada"
+                  label="Tarjeta rechazada"
                   variant="ghost"
                   onPress={() =>
                     fillTestCard(TEST_CARDS.declined, 'DECLINED TEST')

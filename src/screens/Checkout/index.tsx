@@ -159,6 +159,8 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
         items: itemsSnapshot,
         shipping: {
           fullName: shipping.fullName.trim(),
+          ...(shipping.email.trim() ? { email: shipping.email.trim() } : {}),
+          ...(shipping.phone.trim() ? { phone: shipping.phone.trim() } : {}),
           address1: shipping.address1.trim(),
           ...(shipping.address2.trim()
             ? { address2: shipping.address2.trim() }
@@ -166,6 +168,9 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
           city: shipping.city.trim(),
           state: shipping.state.trim(),
           zip: shipping.zip.trim(),
+          ...(shipping.country.trim()
+            ? { country: shipping.country.trim() }
+            : {}),
         },
       };
       await saveTransaction(transaction);

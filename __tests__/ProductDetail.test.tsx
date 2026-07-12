@@ -71,7 +71,10 @@ describe('ProductDetailScreen', () => {
     const tree = await renderDetail(await makeStore(), 'p-1');
 
     expect(hasText(tree, 'Nero Crossbody')).toBe(true);
-    expect(hasText(tree, '$ 850.000')).toBe(true);
+    // PriceText splits amount and currency code (the code renders in Oi).
+    const rendered = JSON.stringify(tree.toJSON());
+    expect(rendered).toContain('850.000');
+    expect(rendered).toContain('COP');
     expect(
       hasText(tree, 'A study in restraint and architectural form.'),
     ).toBe(true);

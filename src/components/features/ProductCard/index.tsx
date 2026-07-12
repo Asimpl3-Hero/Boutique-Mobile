@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { colors, moderateScale } from '@theme';
-import { CheckIcon, PlusIcon } from '@components/ui';
+import { CheckIcon, PlusIcon, PriceText } from '@components/ui';
+import { SoldOutBadge } from '@components/ux';
 import { useAppDispatch, addItem } from '@store';
 import type { Product } from '@lib/services/products';
 import { styles } from './ProductCard.styles';
@@ -34,6 +35,7 @@ export const ProductCard = ({
   const dispatch = useAppDispatch();
   const [justAdded, setJustAdded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const soldOut = product.stock === 0;
 
   useEffect(
     () => () => {
@@ -45,7 +47,7 @@ export const ProductCard = ({
   );
 
   const handleAdd = () => {
-    if (justAdded) {
+    if (justAdded || soldOut) {
       return;
     }
     dispatch(addItem(product));
@@ -60,18 +62,21 @@ export const ProductCard = ({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={
-        justAdded
-          ? `${product.name} agregado al carrito`
-          : `Agregar ${product.name} al carrito`
+        soldOut
+          ? `${product.name} agotado`
+          : justAdded
+            ? `${product.name} agregado al carrito`
+            : `Agregar ${product.name} al carrito`
       }
-      accessibilityState={justAdded ? { disabled: true } : {}}
-      disabled={justAdded}
+      accessibilityState={justAdded || soldOut ? { disabled: true } : {}}
+      disabled={justAdded || soldOut}
       hitSlop={HIT_SLOP}
       onPress={handleAdd}
       style={[
         styles.addButton,
         overlay && styles.addButtonOverlay,
         justAdded && styles.addButtonSuccess,
+        soldOut && styles.addButtonDisabled,
       ]}
     >
       {justAdded ? (
@@ -96,6 +101,7 @@ export const ProductCard = ({
           resizeMode="cover"
           accessibilityLabel={product.name}
         />
+        {soldOut ? <SoldOutBadge /> : null}
         {variant === 'tile' ? addButton(true) : null}
       </View>
       {variant !== 'tile' ? (
@@ -104,7 +110,11 @@ export const ProductCard = ({
             {product.name}
           </Text>
           <View style={styles.row}>
-            <Text style={styles.price}>{product.formattedPrice}</Text>
+            <PriceText
+              valueInCents={product.priceInCents}
+              currency={product.currency}
+              style={styles.price}
+            />
             {addButton(false)}
           </View>
         </View>

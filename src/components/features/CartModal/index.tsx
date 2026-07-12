@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from '@react-native-community/blur';
-import { Button } from '@components/ui';
+import { Button, PriceText } from '@components/ui';
 import {
   useAppDispatch,
   useAppSelector,
@@ -13,7 +13,6 @@ import {
   selectCartItems,
   selectCartTotal,
 } from '@store';
-import { formatPrice } from '@lib';
 import { spacing } from '@theme';
 import { styles } from './CartModal.styles';
 
@@ -80,12 +79,11 @@ export const CartModal = ({ visible, onClose, onCheckout }: CartModalProps) => {
                       <Text style={styles.itemName} numberOfLines={1}>
                         {item.product.name}
                       </Text>
-                      <Text style={styles.itemPrice}>
-                        {formatPrice(
-                          item.product.priceInCents * item.quantity,
-                          item.product.currency,
-                        )}
-                      </Text>
+                      <PriceText
+                        valueInCents={item.product.priceInCents * item.quantity}
+                        currency={item.product.currency}
+                        style={styles.itemPrice}
+                      />
                     </View>
                     <View style={styles.qtyRow}>
                       <Pressable
@@ -116,7 +114,7 @@ export const CartModal = ({ visible, onClose, onCheckout }: CartModalProps) => {
               <View style={styles.divider} />
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>{formatPrice(total)}</Text>
+                <PriceText valueInCents={total} style={styles.totalValue} />
               </View>
               <Button label="Finalizar compra" onPress={checkout} />
               <Button

@@ -94,4 +94,21 @@ describe('ProductCard', () => {
     jest.useRealTimers();
   });
 
+  test('sold out: shows the tilted stamp and blocks add-to-cart', async () => {
+    const store = makeStore();
+    const tree = await render(
+      <Provider store={store}>
+        <ProductCard product={{ ...product, stock: 0 }} />
+      </Provider>,
+    );
+
+    expect(JSON.stringify(tree.toJSON())).toContain('SOLD OUT');
+
+    const addButton = tree.root.findByProps({
+      accessibilityLabel: 'Summer Dress agotado',
+    });
+    expect(addButton.props.accessibilityState).toEqual({ disabled: true });
+    await ReactTestRenderer.act(() => addButton.props.onPress());
+    expect(selectCartCount(store.getState())).toBe(0);
+  });
 });

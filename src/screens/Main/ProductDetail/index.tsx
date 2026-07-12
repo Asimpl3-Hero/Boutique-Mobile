@@ -3,8 +3,14 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Header, BAR_HEIGHT, WAVE_PATH } from '@components/layout';
-import { Button, CheckIcon, ShieldIcon, TruckIcon } from '@components/ui';
-import { PerkBadge } from '@components/ux';
+import {
+  Button,
+  CheckIcon,
+  PriceText,
+  ShieldIcon,
+  TruckIcon,
+} from '@components/ui';
+import { PerkBadge, SoldOutBadge } from '@components/ux';
 import { useAppDispatch, useAppSelector, addItem, selectProductById } from '@store';
 import { colors, moderateScale, spacing } from '@theme';
 import type { HomeStackScreenProps } from '@/navigation';
@@ -102,6 +108,7 @@ export const ProductDetailScreen = ({
             resizeMode="cover"
             accessibilityLabel={product.name}
           />
+          {product.stock === 0 ? <SoldOutBadge /> : null}
           {/* Same brand wave as the header, rising from the photo's base. */}
           <Svg
             pointerEvents="none"
@@ -115,7 +122,11 @@ export const ProductDetailScreen = ({
         <View style={styles.content}>
           <View style={styles.eyebrowRow}>
             <Text style={styles.eyebrow}>Novedad</Text>
-            <Text style={styles.price}>{product.formattedPrice}</Text>
+            <PriceText
+              valueInCents={product.priceInCents}
+              currency={product.currency}
+              style={styles.price}
+            />
           </View>
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.stock}>
