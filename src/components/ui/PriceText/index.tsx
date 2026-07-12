@@ -6,6 +6,8 @@ import { styles } from './PriceText.styles';
 export interface PriceTextProps extends TextProps {
   valueInCents: number;
   currency?: string;
+  /** Renders the currency code in the surrounding style instead of Oi. */
+  plainCode?: boolean;
 }
 
 /**
@@ -15,10 +17,20 @@ export interface PriceTextProps extends TextProps {
 export const PriceText = ({
   valueInCents,
   currency = 'COP',
+  plainCode = false,
   style,
   ...textProps
 }: PriceTextProps) => {
   const formatted = formatPrice(valueInCents, currency);
+
+  if (plainCode) {
+    return (
+      <Text style={style} {...textProps}>
+        {formatted}
+      </Text>
+    );
+  }
+
   const suffix = ` ${currency}`;
   const hasSuffix = formatted.endsWith(suffix);
   const amount = hasSuffix

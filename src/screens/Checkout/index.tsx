@@ -15,6 +15,7 @@ import {
   useAppSelector,
   addItem,
   clear,
+  fetchProducts,
   removeItem,
   removeLine,
   resetOrderFlow,
@@ -177,6 +178,8 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
       lastTransaction.current = transaction;
       if (result.finalStatus === 'APPROVED') {
         dispatch(clear());
+        // The backend decremented stock: refresh the catalog snapshot.
+        dispatch(fetchProducts());
       } else {
         notify('Pago rechazado. Intenta con otro medio de pago.');
       }

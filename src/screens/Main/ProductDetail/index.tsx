@@ -108,7 +108,7 @@ export const ProductDetailScreen = ({
             resizeMode="cover"
             accessibilityLabel={product.name}
           />
-          {product.stock === 0 ? <SoldOutBadge /> : null}
+          {product.stock === 0 ? <SoldOutBadge large /> : null}
           {/* Same brand wave as the header, rising from the photo's base. */}
           <Svg
             pointerEvents="none"

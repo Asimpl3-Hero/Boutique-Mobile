@@ -73,10 +73,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  // Letterhead title in the Oi brand face (sized down: Oi runs wide).
   titleText: {
-    ...typography.body,
-    fontFamily: typography.button.fontFamily,
-    letterSpacing: 2.5,
+    ...typography.heading,
+    fontSize: moderateScale(13),
+    lineHeight: moderateScale(20),
+    letterSpacing: 1,
     color: colors.text,
   },
   number: {

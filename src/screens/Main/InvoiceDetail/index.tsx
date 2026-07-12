@@ -210,6 +210,7 @@ export const InvoiceDetailScreen = ({
                   <PriceText
                     valueInCents={item.priceInCents * item.quantity}
                     currency={item.currency}
+                    plainCode
                     style={[styles.cellText, styles.cellPrice]}
                   />
                 </View>
@@ -222,6 +223,7 @@ export const InvoiceDetailScreen = ({
                     </Text>
                     <PriceText
                       valueInCents={transaction.amountInCents - taxInCents}
+                      plainCode
                       style={[styles.cellText, styles.cellPrice]}
                     />
                   </View>
@@ -231,6 +233,7 @@ export const InvoiceDetailScreen = ({
                     </Text>
                     <PriceText
                       valueInCents={taxInCents}
+                      plainCode
                       style={[styles.cellText, styles.cellPrice]}
                     />
                   </View>

@@ -14,11 +14,16 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.overlay,
   },
   // Square brand band, tilted like a stamped label.
+  // Background is animated in the component (primary ⇄ secondary drift).
   band: {
-    backgroundColor: colors.text,
+    backgroundColor: colors.primary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     transform: [{ rotate: '-12deg' }],
+  },
+  bandLarge: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
   text: {
     ...typography.heading,
@@ -26,5 +31,10 @@ export const styles = StyleSheet.create({
     lineHeight: moderateScale(22),
     letterSpacing: 1.5,
     color: colors.onPrimary,
+  },
+  textLarge: {
+    fontSize: moderateScale(24),
+    lineHeight: moderateScale(34),
+    letterSpacing: 2,
   },
 });
