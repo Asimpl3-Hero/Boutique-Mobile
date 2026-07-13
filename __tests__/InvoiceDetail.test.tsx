@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { InvoiceDetailScreen } from '@screens';
+import { Button } from '@components/ui';
 import type { StoredTransaction } from '@lib';
 
 const fullTransaction: StoredTransaction = {
@@ -41,7 +42,7 @@ const legacyTransaction: StoredTransaction = {
 
 const renderDetail = async (
   transaction: StoredTransaction,
-  navigation: { goBack?: jest.Mock } = {},
+  navigation: { goBack?: jest.Mock; getParent?: jest.Mock } = {},
 ) => {
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -80,6 +81,23 @@ describe('InvoiceDetailScreen', () => {
     expect(hasText(tree, 'Precio sin IVA')).toBe(true);
     expect(hasText(tree, 'IVA aplicado (18%)')).toBe(true);
     expect(hasText(tree, 'Precio Total')).toBe(true);
+
+    await ReactTestRenderer.act(() => tree.unmount());
+  });
+
+  test('the home button jumps to the Home tab root', async () => {
+    const navigate = jest.fn();
+    const getParent = jest.fn(() => ({ navigate }));
+    const tree = await renderDetail(fullTransaction, { getParent });
+
+    const home = tree.root
+      .findAllByType(Button)
+      .find(node => node.props.label === 'Volver al inicio');
+    expect(home).toBeDefined();
+    await ReactTestRenderer.act(async () => {
+      home!.props.onPress();
+    });
+    expect(navigate).toHaveBeenCalledWith('Home', { screen: 'HomeMain' });
 
     await ReactTestRenderer.act(() => tree.unmount());
   });

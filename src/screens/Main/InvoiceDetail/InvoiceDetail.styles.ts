@@ -36,6 +36,9 @@ export const styles = StyleSheet.create({
     // Tucks under the card so no seam shows between them.
     marginTop: -StyleSheet.hairlineWidth,
   },
+  homeButton: {
+    marginTop: spacing.xl,
+  },
   shippingLabel: {
     ...typography.caption,
     letterSpacing: 1,

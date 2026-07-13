@@ -3,7 +3,7 @@ import { Animated, Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Header } from '@components/layout';
-import { PriceText } from '@components/ui';
+import { Button, PriceText } from '@components/ui';
 import { useColorCycle } from '@lib';
 import { colors } from '@theme';
 import type { InvoicesStackScreenProps } from '@/navigation';
@@ -50,6 +50,11 @@ export const InvoiceDetailScreen = ({
 
   // Soft flicker-free color drift behind the receipt.
   const backdrop = useColorCycle(BACKDROP_PALETTE, BACKDROP_LEG_MS);
+
+  const goHome = () => {
+    // Jump to the Home tab's root: the tab navigator is the parent.
+    navigation.getParent()?.navigate('Home', { screen: 'HomeMain' });
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -221,6 +226,11 @@ export const InvoiceDetailScreen = ({
           >
             <Path d={TORN_PATH} fill={colors.surface} />
           </Svg>
+          <Button
+            label="Volver al inicio"
+            onPress={goHome}
+            style={styles.homeButton}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
