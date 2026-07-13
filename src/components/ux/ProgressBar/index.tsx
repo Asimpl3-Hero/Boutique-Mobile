@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, View } from 'react-native';
+import { useLoopedTiming } from '@lib';
 import { colors } from '@theme';
 import { SEGMENT_RATIO, styles } from './ProgressBar.styles';
+
+/** Duration of each indeterminate sweep across the track. */
+const SWEEP_DURATION_MS = 1100;
+
+// Module-level so the loop effect never restarts on re-render.
+const SWEEP_EASING = Easing.inOut(Easing.ease);
 
 export interface ProgressBarProps {
   /** 0–1 for determinate mode; omit for the indeterminate sweep. */
@@ -21,25 +28,12 @@ export const ProgressBar = ({
   const barColor = color ?? colors.primary;
   const indeterminate = progress === undefined;
   const [trackWidth, setTrackWidth] = useState(0);
-  const sweep = useRef(new Animated.Value(0)).current;
+  const sweep = useLoopedTiming(SWEEP_DURATION_MS, {
+    easing: SWEEP_EASING,
+    enabled: indeterminate,
+  });
   // Grows from empty toward each target instead of jumping.
   const fill = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (!indeterminate) {
-      return;
-    }
-    const loop = Animated.loop(
-      Animated.timing(sweep, {
-        toValue: 1,
-        duration: 1100,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [indeterminate, sweep]);
 
   useEffect(() => {
     if (indeterminate || trackWidth === 0) {

@@ -1,7 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
+import React from 'react';
+import { Animated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useLoopedTiming } from '@lib';
 import type { IconProps } from './HomeIcon';
+
+/** Full revolution duration of the spinning arc. */
+const SPIN_DURATION_MS = 900;
 
 /** Self-spinning arc — loading feedback. */
 export const LoadingIcon = ({
@@ -9,20 +13,7 @@ export const LoadingIcon = ({
   color = '#000000',
   strokeWidth = 2.4,
 }: IconProps) => {
-  const spin = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.timing(spin, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [spin]);
+  const spin = useLoopedTiming(SPIN_DURATION_MS);
 
   const rotate = spin.interpolate({
     inputRange: [0, 1],

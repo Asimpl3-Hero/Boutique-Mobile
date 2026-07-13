@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { colors, moderateScale } from '@theme';
 import { CheckIcon, PlusIcon, PriceText } from '@components/ui';
 import { SoldOutBadge } from '@components/ux';
 import { useAppDispatch, addItem } from '@store';
+import { useTimedFlag } from '@lib';
 import type { Product } from '@lib/services/products';
 import { styles } from './ProductCard.styles';
 
@@ -33,29 +34,15 @@ export const ProductCard = ({
   onPress,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
-  const [justAdded, setJustAdded] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [justAdded, markAdded] = useTimedFlag(ADDED_FEEDBACK_MS);
   const soldOut = product.stock === 0;
-
-  useEffect(
-    () => () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    },
-    [],
-  );
 
   const handleAdd = () => {
     if (justAdded || soldOut) {
       return;
     }
     dispatch(addItem(product));
-    setJustAdded(true);
-    timerRef.current = setTimeout(
-      () => setJustAdded(false),
-      ADDED_FEEDBACK_MS,
-    );
+    markAdded();
   };
 
   const addButton = (overlay: boolean) => (

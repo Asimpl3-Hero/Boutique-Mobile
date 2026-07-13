@@ -1,18 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Image,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import React from 'react';
+import { Animated, Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Header } from '@components/layout';
 import { PriceText } from '@components/ui';
-
-import { colors, moderateScale } from '@theme';
+import { useColorCycle } from '@lib';
+import { colors } from '@theme';
 import type { InvoicesStackScreenProps } from '@/navigation';
 import { formatInvoiceDate, invoiceNumber } from '../Invoices';
 import { styles } from './InvoiceDetail.styles';
@@ -33,16 +26,13 @@ const TORN_PATH = `M0 0 ${Array.from(
 
 /** Backdrop mood colors cycled softly behind the white receipt. */
 const BACKDROP_PALETTE: string[] = [
-  colors.primary,
+  colors.onAccent,
   colors.secondary,
   colors.accent,
-  colors.success,
 ];
 
-const pickNext = (current: string): string => {
-  const options = BACKDROP_PALETTE.filter(color => color !== current);
-  return options[Math.floor(Math.random() * options.length)];
-};
+/** Duration of each color-to-color leg of the backdrop cycle. */
+const BACKDROP_LEG_MS = 3500;
 
 type InvoiceDetailProps = InvoicesStackScreenProps<'InvoiceDetail'>;
 
@@ -58,34 +48,8 @@ export const InvoiceDetailScreen = ({
   const taxInCents = transaction.taxInCents;
   const hasTax = typeof taxInCents === 'number' && taxInCents > 0;
 
-  // Soft random color drift behind the receipt.
-  const blend = useRef(new Animated.Value(0)).current;
-  const [pair, setPair] = useState({
-    from: BACKDROP_PALETTE[0],
-    to: BACKDROP_PALETTE[1],
-  });
-
-  useEffect(() => {
-    blend.setValue(0);
-    const animation = Animated.timing(blend, {
-      toValue: 1,
-      duration: 3500,
-      easing: Easing.inOut(Easing.ease),
-      // Color interpolation cannot run on the native driver.
-      useNativeDriver: false,
-    });
-    animation.start(({ finished }) => {
-      if (finished) {
-        setPair(current => ({ from: current.to, to: pickNext(current.to) }));
-      }
-    });
-    return () => animation.stop();
-  }, [pair, blend]);
-
-  const backdrop = blend.interpolate({
-    inputRange: [0, 1],
-    outputRange: [pair.from, pair.to],
-  });
+  // Soft flicker-free color drift behind the receipt.
+  const backdrop = useColorCycle(BACKDROP_PALETTE, BACKDROP_LEG_MS);
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>

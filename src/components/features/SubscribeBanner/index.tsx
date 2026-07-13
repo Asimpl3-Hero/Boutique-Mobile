@@ -1,19 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useState } from 'react';
+import { Animated, Pressable, Text, TextInput, View } from 'react-native';
 import { CheckIcon } from '@components/ui';
-import { validateEmail } from '@lib';
+import { useColorCycle, validateEmail } from '@lib';
 import { colors, moderateScale } from '@theme';
 import { styles } from './SubscribeBanner.styles';
 
-/** One-way blend duration; the loop ping-pongs back for a soft drift. */
+/** One-way blend duration; the cycle drifts back for a soft ping-pong. */
 const BLEND_DURATION_MS = 3500;
+
+/** Brand pair the band background drifts between. */
+const BLEND_PALETTE = [colors.secondary, colors.primary];
 
 /** Full-width newsletter band: email capture with inline validation. */
 export const SubscribeBanner = () => {
@@ -22,26 +18,7 @@ export const SubscribeBanner = () => {
   const [subscribed, setSubscribed] = useState(false);
 
   // Background drifts between the two brand colors, forever.
-  const blend = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const timing = (toValue: number) =>
-      Animated.timing(blend, {
-        toValue,
-        duration: BLEND_DURATION_MS,
-        easing: Easing.inOut(Easing.ease),
-        // Color interpolation cannot run on the native driver.
-        useNativeDriver: false,
-      });
-    const loop = Animated.loop(Animated.sequence([timing(1), timing(0)]));
-    loop.start();
-    return () => loop.stop();
-  }, [blend]);
-
-  const backgroundColor = blend.interpolate({
-    inputRange: [0, 1],
-    outputRange: [colors.secondary, colors.primary],
-  });
+  const backgroundColor = useColorCycle(BLEND_PALETTE, BLEND_DURATION_MS);
 
   const handleSubscribe = () => {
     if (subscribed) {

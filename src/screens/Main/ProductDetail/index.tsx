@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -18,6 +18,7 @@ import {
   selectCartItems,
   selectProductById,
 } from '@store';
+import { useTimedFlag } from '@lib';
 import { colors, moderateScale, spacing } from '@theme';
 import type { HomeStackScreenProps } from '@/navigation';
 import { styles } from './ProductDetail.styles';
@@ -59,17 +60,7 @@ export const ProductDetailScreen = ({
   const [selectedFinish, setSelectedFinish] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
-  const [justAdded, setJustAdded] = useState(false);
-  const addedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (addedTimer.current) {
-        clearTimeout(addedTimer.current);
-      }
-    },
-    [],
-  );
+  const [justAdded, markAdded] = useTimedFlag(ADDED_FEEDBACK_MS);
 
   const availableStock = product ? Math.max(0, product.stock - inCart) : 0;
 
@@ -82,11 +73,7 @@ export const ProductDetailScreen = ({
       dispatch(addItem(product));
     }
     setQuantity(1);
-    setJustAdded(true);
-    addedTimer.current = setTimeout(
-      () => setJustAdded(false),
-      ADDED_FEEDBACK_MS,
-    );
+    markAdded();
   };
 
   if (!product) {
