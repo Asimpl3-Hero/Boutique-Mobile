@@ -6,7 +6,8 @@ App **React Native (TypeScript)** de la boutique de ropa **BORCELLE**: catálogo
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-Flux-764ABC?logo=redux&logoColor=white)
 ![React Navigation](https://img.shields.io/badge/React%20Navigation-7-6B52AE)
-![Jest](https://img.shields.io/badge/Jest-73%20tests-C21325?logo=jest&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-106%20tests-C21325?logo=jest&logoColor=white)
+![Coverage](https://img.shields.io/badge/Coverage-90%25-2E9E6B)
 
 <p align="center">
   <img src="src/assets/video/Borcelle-Preview.gif" alt="Recorrido de la app: catálogo, carrito y checkout" width="280" />
@@ -84,12 +85,19 @@ npm run ios                   # (macOS) pod install primero
 ## ✅ Tests y calidad
 
 ```sh
-npm test              # 20 suites · 73 tests (Jest)
+npm test              # 28 suites · 106 tests (Jest)
 npm run lint          # ESLint
 npx tsc --noEmit      # typecheck
 ```
 
-Cubren: slices y polling de órdenes, guardado cifrado (con guardia anti-PAN), validaciones, formateo de moneda e IVA, componentes de UI/UX (loaders, sold out, checkout) y pantallas clave.
+| Cobertura | % |
+|---|---|
+| Statements | 90.7% |
+| Lines | 90.7% |
+| Functions | 82.2% |
+| Branches | 75.9% |
+
+Cubren: el flujo completo de checkout (bolsa, envío, tokenización de tarjeta y pago aprobado/rechazado/error), slices y polling de órdenes, guardado cifrado (con guardia anti-PAN), cliente HTTP y servicio de pagos, validaciones, formateo de moneda e IVA, componentes de UI/UX (loaders, sold out, carrito) y las pantallas de catálogo y facturas.
 
 ## 📐 Convenciones
 
