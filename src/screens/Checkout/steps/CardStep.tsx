@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -188,7 +189,7 @@ export const CardStep = ({
       )}
       {cards.length < MAX_CARDS ? (
         <Button
-          label={cards.length > 0 ? 'Agregar otra tarjeta' : 'Pagar con tarjeta'}
+          label={cards.length > 0 ? 'Agregar otra tarjeta' : 'Agregar una tarjeta'}
           variant={cards.length > 0 ? 'ghost' : 'primary'}
           onPress={() => setOpen(true)}
         />
@@ -300,6 +301,11 @@ export const CardStep = ({
             ) : null}
             <Button
               label={submitting ? 'Guardando…' : 'Guardar tarjeta'}
+              icon={
+                submitting ? (
+                  <ActivityIndicator size="small" color={colors.onPrimary} />
+                ) : undefined
+              }
               onPress={save}
               disabled={submitting}
             />

@@ -182,6 +182,75 @@ describe('ordersSlice', () => {
     expect(selectOrderFlowStatus(store.getState())).toBe('error');
   });
 
+  test('submitOrders retry skips lines already approved', async () => {
+    // First run: line 1 approves, line 2 stays pending until the cap.
+    mockedCreate
+      .mockResolvedValueOnce({
+        orderId: 'o-1',
+        checkoutUrl: null,
+        status: 'APPROVED',
+      })
+      .mockResolvedValueOnce({
+        orderId: 'o-2',
+        checkoutUrl: null,
+        status: 'PENDING',
+      });
+    mockedGet
+      .mockResolvedValueOnce({
+        id: 'o-1',
+        status: 'APPROVED',
+        taxRatePercent: 18,
+        taxInCents: 1800,
+        amountInCents: 11800,
+      })
+      .mockResolvedValueOnce({ id: 'o-2', status: 'PENDING' })
+      .mockResolvedValueOnce({ id: 'o-2', status: 'PENDING' });
+    const store = makeStore();
+
+    await store.dispatch(
+      submitOrders({
+        requests: [request, request],
+        intervalMs: 0,
+        maxAttempts: 2,
+      }),
+    );
+    expect(selectOrderFlowStatus(store.getState())).toBe('error');
+
+    // Retry: only the stuck line is created again — o-1 is never re-charged.
+    mockedCreate.mockResolvedValueOnce({
+      orderId: 'o-3',
+      checkoutUrl: null,
+      status: 'APPROVED',
+    });
+    mockedGet.mockResolvedValueOnce({
+      id: 'o-3',
+      status: 'APPROVED',
+      taxRatePercent: 18,
+      taxInCents: 1500,
+      amountInCents: 9800,
+    });
+
+    const result = await store
+      .dispatch(
+        submitOrders({
+          requests: [request, request],
+          intervalMs: 0,
+          maxAttempts: 2,
+        }),
+      )
+      .unwrap();
+
+    expect(mockedCreate).toHaveBeenCalledTimes(3);
+    expect(result).toEqual({
+      finalStatus: 'APPROVED',
+      orderIds: ['o-1', 'o-3'],
+      amountInCents: 21600,
+      taxInCents: 3300,
+      taxRatePercent: 18,
+    });
+    expect(selectOrderFlowStatus(store.getState())).toBe('approved');
+  });
+
   test('resetOrderFlow returns to idle', async () => {
     mockedCreate.mockResolvedValueOnce({
       orderId: 'o-1',

@@ -73,6 +73,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  qtyButtonDisabled: {
+    opacity: 0.4,
+  },
   qtyButtonText: {
     ...typography.button,
     fontSize: moderateScale(14),

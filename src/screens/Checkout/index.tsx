@@ -253,7 +253,8 @@ export const CheckoutScreen = ({ navigation }: CheckoutProps) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
-      <Header onBackPress={() => navigation.goBack()} />
+      {/* Same step-aware back as the "Atrás" button: never drops the flow. */}
+      <Header onBackPress={goBack} />
       <View style={styles.stepper}>
         <Stepper steps={STEPS} current={step} />
       </View>

@@ -77,7 +77,15 @@ export const BagStep = ({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Agregar uno de ${item.product.name}`}
-                style={styles.qtyButton}
+                accessibilityState={
+                  item.quantity >= item.product.stock ? { disabled: true } : {}
+                }
+                disabled={item.quantity >= item.product.stock}
+                style={[
+                  styles.qtyButton,
+                  item.quantity >= item.product.stock &&
+                    styles.qtyButtonDisabled,
+                ]}
                 onPress={() => onIncrease(item)}
               >
                 <Text style={styles.qtyButtonText}>+</Text>

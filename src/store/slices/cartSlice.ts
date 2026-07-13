@@ -18,12 +18,14 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    /** Adds one unit of the product (new entry or +1 on the existing one). */
+    /** Adds one unit of the product (new entry or +1), capped at its stock. */
     addItem(state, action: PayloadAction<Product>) {
       const entry = state.items.find(i => i.product.id === action.payload.id);
       if (entry) {
-        entry.quantity += 1;
-      } else {
+        if (entry.quantity < entry.product.stock) {
+          entry.quantity += 1;
+        }
+      } else if (action.payload.stock > 0) {
         state.items.push({ product: action.payload, quantity: 1 });
       }
     },

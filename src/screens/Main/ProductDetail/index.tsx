@@ -11,7 +11,13 @@ import {
   TruckIcon,
 } from '@components/ui';
 import { PerkBadge, SoldOutBadge } from '@components/ux';
-import { useAppDispatch, useAppSelector, addItem, selectProductById } from '@store';
+import {
+  useAppDispatch,
+  useAppSelector,
+  addItem,
+  selectCartItems,
+  selectProductById,
+} from '@store';
 import { colors, moderateScale, spacing } from '@theme';
 import type { HomeStackScreenProps } from '@/navigation';
 import { styles } from './ProductDetail.styles';
@@ -43,6 +49,13 @@ export const ProductDetailScreen = ({
   const product = useAppSelector(state =>
     selectProductById(state, route.params.productId),
   );
+  // Units of this product already in the bag: the stepper caps at what's left.
+  const inCart = useAppSelector(
+    state =>
+      selectCartItems(state).find(
+        item => item.product.id === route.params.productId,
+      )?.quantity ?? 0,
+  );
   const [selectedFinish, setSelectedFinish] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
@@ -58,13 +71,17 @@ export const ProductDetailScreen = ({
     [],
   );
 
+  const availableStock = product ? Math.max(0, product.stock - inCart) : 0;
+
   const handleAdd = () => {
-    if (justAdded || !product) {
+    if (justAdded || !product || availableStock === 0) {
       return;
     }
-    for (let unit = 0; unit < quantity; unit += 1) {
+    const unitsToAdd = Math.min(quantity, availableStock);
+    for (let unit = 0; unit < unitsToAdd; unit += 1) {
       dispatch(addItem(product));
     }
+    setQuantity(1);
     setJustAdded(true);
     addedTimer.current = setTimeout(
       () => setJustAdded(false),
@@ -212,7 +229,9 @@ export const ProductDetailScreen = ({
               accessibilityLabel="Aumentar cantidad"
               style={styles.qtyButton}
               onPress={() =>
-                setQuantity(current => Math.min(product.stock, current + 1))
+                setQuantity(current =>
+                  Math.min(Math.max(1, availableStock), current + 1),
+                )
               }
             >
               <Text style={styles.qtyButtonText}>+</Text>
@@ -222,9 +241,11 @@ export const ProductDetailScreen = ({
             label={
               justAdded
                 ? 'Añadido al carrito'
-                : quantity > 1
-                  ? `Añadir ${quantity} al Carrito`
-                  : 'Añadir al Carrito'
+                : product.stock > 0 && availableStock === 0
+                  ? 'Ya está todo en tu bolsa'
+                  : quantity > 1
+                    ? `Añadir ${quantity} al Carrito`
+                    : 'Añadir al Carrito'
             }
             icon={
               justAdded ? (
@@ -234,7 +255,7 @@ export const ProductDetailScreen = ({
                 />
               ) : undefined
             }
-            disabled={product.stock === 0}
+            disabled={availableStock === 0}
             onPress={handleAdd}
             style={[styles.addButton, justAdded && styles.addButtonSuccess]}
           />
